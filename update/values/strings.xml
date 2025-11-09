@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">bt1</string>
+
+    <!-- một số nhãn và tiêu đề dùng chung -->
+    <string name="category_label">Danh mục</string>
+    <string name="passinput_label">Mật khẩu</string>
+
+    <!-- các nhãn trong thanh điều hướng phía dưới -->
+    <string name="homepage_nav_item_label">Trang chủ</string>
+    <string name="cart_nav_item_label">Giỏ hàng</string>
+    <string name="user_nav_item_label">Cá nhân</string>
+
+    <!-- các nhãn/tiêu đề cho trang chủ -->
+    <string name="above_recyclerview_home_title">Sản phẩm nổi bật</string>
+    <string name="search_bar_label">Tìm kiếm sản phẩm...</string>
+    <string name="banner_label">Quảng cáo</string>
+
+    <!-- các nhãn/tiêu đề trang đăng ký -->
+    <string name="register_label">Tạo Tài Khoản Mới</string>
+    <string name="register_req">Hoàn thành các thông tin dưới đây để đăng ký</string>
+    <string name="userinput_register_label">Tên người dùng</string>
+    <string name="emailinput_register_label">Địa chỉ Email</string>
+    <string name="confirmpass_register_label">Xác nhận Mật khẩu</string>
+    <string name="btn_register_label">Đăng ký tài khoản</string>
+    <string name="redirectlogin_label">"Đã có tài khoản? "</string>
+    <string name="btn_redirectlogin_label">Đăng nhập ngay</string>
+
+    <!-- các nhãn/tiêu đề trang đăng nhập -->
+    <string name="login_label">Chào mừng!</string>
+    <string name="login_req">Đăng nhập để khám phá ngay</string>
+    <string name="emailuserinput_login_label">Tên đăng nhập hoặc Email</string>
+    <string name="forgotpass_login_label">Quên mật khẩu?</string>
+    <string name="btn_login_label">Đăng nhập</string>
+    <string name="redirectregister_label">"Chưa có tài khoản? "</string>
+    <string name="btn_redirectregister_label">Đăng ký ngay</string>
+
+    <!-- các nhãn/tiêu đề trang thông số chi tiết sản phẩm -->
+    <string name="product_spec_title">Thông số sản phẩm</string>
+    <string name="buy_button_label">Mua sản phẩm</string>
+    <string name="cart_button_label">Thêm vào giỏ hàng</string>
+    <string name="product_comment_title">Đánh giá sản phẩm</string>
+
+
+</resources>
