@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <!-- Checkbox for selection -->
+        <CheckBox
+            android:id="@+id/checkbox_select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="8dp"
+            android:visibility="gone" />
+
+        <!-- Product Image -->
+        <ImageView
+            android:id="@+id/image_product"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/iphone_15"
+            android:scaleType="centerCrop"
+            android:background="@drawable/rounded_corner_8dp" />
+
+        <!-- Product Info -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp"
+            android:layout_gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/text_product_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="iPhone 15 Pro Max 256GB"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/text_product_brand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Apple"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:layout_marginTop="4dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/text_product_price"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="30.590.000₫"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#DC143C" />
+
+                <TextView
+                    android:id="@+id/text_original_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="32.590.000₫"
+                    android:textSize="12sp"
+                    android:textColor="#999999"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/strikethrough_text" />
+
+            </LinearLayout>
+
+            <!-- Stock status -->
+            <TextView
+                android:id="@+id/text_stock_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Còn hàng"
+                android:textSize="12sp"
+                android:textColor="#4CAF50"
+                android:layout_marginTop="4dp"
+                android:drawableStart="@drawable/ic_check_circle"
+                android:drawablePadding="4dp"
+                app:drawableTint="#4CAF50" />
+
+        </LinearLayout>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp">
+
+            <ImageButton
+                android:id="@+id/btn_remove_favorite"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_favorite_filled"
+                android:background="@drawable/circular_button_background"
+                android:backgroundTint="#FFE5E5"
+                app:tint="#F44336"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="Bỏ yêu thích" />
+
+            <ImageButton
+                android:id="@+id/btn_add_to_cart"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_cart"
+                android:background="@drawable/circular_button_background"
+                android:backgroundTint="#E5F5E5"
+                app:tint="#4CAF50"
+                android:contentDescription="Thêm vào giỏ hàng" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

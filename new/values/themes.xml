@@ -1,0 +1,52 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Bt1" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- Ví dụ: <item name="colorPrimary">@color/purple_500</item> -->
+    </style>
+
+    <style name="Theme.Bt1" parent="Base.Theme.Bt1" />
+
+    <!-- =================================================================== -->
+    <!-- STYLE CHO CÁC Ô NHẬP LIỆU BO GÓC (TextInputLayout)                   -->
+    <!-- =================================================================== -->
+
+    <!-- Style này sẽ được áp dụng cho các TextInputLayout trong file layout -->
+    <style name="RoundedTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.App.Rounded</item>
+    </style>
+
+    <!-- Style này định nghĩa hình dạng với bán kính bo góc là 12dp -->
+    <style name="ShapeAppearance.App.Rounded" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <!-- Style để biến ảnh thành hình tròn -->
+    <style name="ShapeAppearance.App.CircleImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- Style cho các mục lựa chọn trong Profile -->
+    <style name="ProfileOption" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:drawablePadding">16dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <!-- Style cho đường kẻ ngang phân cách -->
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">#E0E0E0</item>
+        <item name="android:layout_marginStart">56dp</item> <!-- Căn lề với text -->
+    </style>
+
+</resources>
