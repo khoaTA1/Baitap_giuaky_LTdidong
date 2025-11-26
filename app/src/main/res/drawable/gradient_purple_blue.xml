@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Alternative gradient backgrounds for login screen -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Purple to Blue gradient (default) -->
+    <item>
+        <shape>
+            <gradient
+                android:angle="135"
+                android:endColor="#667eea"
+                android:startColor="#764ba2"
+                android:type="linear" />
+        </shape>
+    </item>
+</selector>
