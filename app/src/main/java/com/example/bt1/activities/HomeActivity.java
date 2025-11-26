@@ -63,16 +63,24 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
     private TextView notificationBadge;
     private TextView textUserGreeting;
     private TextView textUserNameProfile;
-    private com.google.android.material.button.MaterialButton btnLoginHome;
+    private MaterialButton btnSort;
     private MaterialCardView cardFlashSale;
     private MaterialCardView cardHotSale;
     private TextView textTimerHours, textTimerMinutes, textTimerSeconds;
+    private MaterialCardView categoryVitamin, categoryDigestion, categoryHormone;
+    private MaterialCardView categoryTreatment, categoryOther1, categoryOther2;
+
     private CountDownTimer countDownTimer;
     private ViewPager2 bannerViewPager;
     private android.widget.LinearLayout bannerIndicator;
     private android.os.Handler bannerHandler = new android.os.Handler();
     private int currentBannerPage = 0;
     private SharedPreferences prefs;
+
+    // các biến toàn cục cho sắp xếp
+    private String sortType = "name"; // "name", "price_low", "price_high"
+    private List<Product> allProducts;
+    private List<Product> filteredProducts;
     
     // Repository and Database
     private ProductRepo productRepo;
@@ -114,6 +122,20 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         bannerViewPager = findViewById(R.id.banner_view_pager);
         bannerIndicator = findViewById(R.id.banner_indicator);
 
+        // Category cards - Danh mục thực phẩm chức năng
+        categoryVitamin = findViewById(R.id.brand_iphone);
+        categoryDigestion = findViewById(R.id.brand_samsung);
+        categoryHormone = findViewById(R.id.brand_xiaomi);
+        categoryTreatment = findViewById(R.id.brand_oppo);
+        categoryOther1 = findViewById(R.id.brand_vivo);
+        categoryOther2 = findViewById(R.id.brand_realme);
+
+        btnSort = findViewById(R.id.btn_sort);
+
+        // khởi tạo các danh sách cho sort
+        allProducts = new ArrayList<>();
+        filteredProducts = new ArrayList<>();
+
         // Thiết lập RecyclerView
         setupRecyclerView();
         
@@ -122,6 +144,9 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
 
         // Thiết lập banner slideshow
         setupBannerSlideshow();
+
+        // thiết lập nút sắp xếp
+        btnSort.setOnClickListener(v -> showSortOptions());
 
         // Thiết lập search functionality
         setupSearchListener();
@@ -143,8 +168,98 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
 
         // Bắt đầu đếm ngược
         startCountdown();
+
+        setupCategoryClickListeners();
     }
 
+    // phần xử lí các thành phần được chuyển qua từ category
+
+    private void setupCategoryClickListeners() {
+        categoryVitamin.setOnClickListener(v -> {
+            navigateToShop("category", "Vitamin & Khoáng chất");
+        });
+
+        categoryDigestion.setOnClickListener(v -> {
+            navigateToShop("category", "Sinh lý - Nội tiết tố");
+        });
+
+        categoryHormone.setOnClickListener(v -> {
+            navigateToShop("category", "Cải thiện tăng cường chức năng");
+        });
+
+        categoryTreatment.setOnClickListener(v -> {
+            navigateToShop("category", "Hỗ trợ điều trị");
+        });
+
+        categoryOther1.setOnClickListener(v -> {
+            navigateToShop("category", "Hỗ trợ tiêu hóa");
+        });
+
+        categoryOther2.setOnClickListener(v -> {
+            navigateToShop("category", "Thần kinh não");
+        });
+    }
+
+    private void navigateToShop(String filterType, String filterValue) {
+        Intent intent = new Intent(HomeActivity.this, ShopActivity.class);
+        intent.putExtra("filter_type", filterType);
+        intent.putExtra("filter_value", filterValue);
+
+        // Debug log
+        android.util.Log.d("CategoryActivity", "Navigate to shop - Type: " + filterType + ", Value: " + filterValue);
+
+        startActivity(intent);
+    }
+
+    private void showSortOptions() {
+        String[] sortOptions = {"Tên sản phẩm", "Giá thấp đến cao", "Giá cao đến thấp"};
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("Sắp xếp theo");
+        builder.setItems(sortOptions, (dialog, which) -> {
+            switch (which) {
+                case 0: sortType = "name"; break;
+                case 1: sortType = "price_low"; break;
+                case 2: sortType = "price_high"; break;
+            }
+            applyFilter();
+        });
+        builder.show();
+    }
+
+    private void applyFilter() {
+        filteredProducts.clear();
+
+        // Apply filter
+        for (Product product : allProducts) {
+            boolean shouldInclude = true;
+
+            if ("search".equals(filterType)) {
+                // Tìm kiếm theo tên sản phẩm
+                shouldInclude = product.getName().toLowerCase().contains(filterValue.toLowerCase());
+            } else if ("brand".equals(filterType)) {
+                shouldInclude = product.getName().contains(filterValue);
+            } else if ("category".equals(filterType)) {
+                // Lọc theo category field của Product
+                shouldInclude = product.getCategory() != null &&
+                        product.getCategory().equals(filterValue);
+            } else if ("price".equals(filterType)) {
+                shouldInclude = filterByPriceRange(product, filterValue);
+            }
+
+            if (shouldInclude) {
+                filteredProducts.add(product);
+            }
+        }
+
+        // Apply sorting
+        applySorting();
+
+        // Update UI
+        updateFilterDisplay();
+        updateProductList();
+    }
+    //======================================================
     private void setupBannerSlideshow() {
         // Danh sách banner
         int[] bannerImages = {
@@ -233,11 +348,12 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         } else {
             textUserGreeting.setText("Xin chào, Khách");
             // Hiển thị nút đăng nhập khi chưa login
+            /*
             btnLoginHome.setVisibility(android.view.View.VISIBLE);
             btnLoginHome.setOnClickListener(v -> {
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
-            });
+            });*/
         }
     }
 
@@ -267,17 +383,6 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         // 4. Gán Adapter cho RecyclerView
         recyclerViewProducts.setAdapter(productAdapter);
     }
-
-    // private void createSampleData() {
-    //     productList = new ArrayList<>();
-    //     // Sử dụng dữ liệu thực phẩm chức năng từ global.java
-    //     global globalData = new global();
-    //     productList = globalData.getDefaultData();
-    // }
-    
-    // private void loadProductList() {
-
-    // }
 
     private void updateProductCache(boolean loadNextPage) {
         if (productRepo == null) {

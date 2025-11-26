@@ -650,6 +650,27 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- SORT BUTTON -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_sort"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/primary_color"
+                android:text="Sắp xếp"
+                android:textColor="@color/text_primary_inverted"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginHorizontal="16dp"
+                android:textAlignment="textStart"
+                app:cornerRadius="22dp"
+                app:icon="@drawable/ic_sort"
+                app:iconPadding="6dp"
+                app:iconSize="18dp"
+                app:iconTint="@color/text_primary_inverted"
+                app:strokeColor="#00B894"
+                app:strokeWidth="2dp" />
+
             <!-- Product grid -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view_products"
