@@ -81,11 +81,11 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
     private String sortType = "name"; // "name", "price_low", "price_high"
     private List<Product> allProducts;
     private List<Product> filteredProducts;
-    private String filterType = "";
+    private String filterType = "all";
     private String filterValue = "";
     private LinearLayout emptyState;
     private LinearLayout currentFilterLayout;
-    private TextView textCurrentFilter;
+    private TextView textCurrentFilter, textViewAllCategories;
     
     // Repository and Database
     private ProductRepo productRepo;
@@ -139,6 +139,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         emptyState = findViewById(R.id.empty_state);
         currentFilterLayout = findViewById(R.id.current_filter_layout);
         textCurrentFilter = findViewById(R.id.text_current_filter);
+        textViewAllCategories = findViewById(R.id.text_view_all_brands);
 
         // khởi tạo các danh sách cho sort
         allProducts = new ArrayList<>();
@@ -155,6 +156,12 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
 
         // thiết lập nút sắp xếp
         btnSort.setOnClickListener(v -> showSortOptions());
+
+        textViewAllCategories.setOnClickListener(v -> {
+            filterType = "all";
+            filterValue = "";
+            applyFilter();
+        });
 
         // Thiết lập search functionality
         setupSearchListener();
@@ -178,6 +185,8 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         startCountdown();
 
         setupCategoryClickListeners();
+
+        applyFilter();
     }
 
     // phần xử lí các thành phần được chuyển qua từ category
@@ -187,36 +196,42 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
             //navigateToShop("category", "Vitamin & Khoáng chất");
             filterType = "category";
             filterValue = "Vitamin & Khoáng chất";
-    });
+            applyFilter();
+        });
 
         categoryDigestion.setOnClickListener(v -> {
             //navigateToShop("category", "Sinh lý - Nội tiết tố");
             filterType = "category";
             filterValue = "Sinh lý - Nội tiết tố";
+            applyFilter();
         });
 
         categoryHormone.setOnClickListener(v -> {
             //navigateToShop("category", "Cải thiện tăng cường chức năng");
             filterType = "category";
             filterValue = "Cải thiện tăng cường chức năng";
+            applyFilter();
         });
 
         categoryTreatment.setOnClickListener(v -> {
             //navigateToShop("category", "Hỗ trợ điều trị");
             filterType = "category";
             filterValue = "Hỗ trợ điều trị";
+            applyFilter();
         });
 
         categoryOther1.setOnClickListener(v -> {
             //navigateToShop("category", "Hỗ trợ tiêu hóa");
             filterType = "category";
             filterValue = "Hỗ trợ tiêu hóa";
+            applyFilter();
         });
 
         categoryOther2.setOnClickListener(v -> {
             //navigateToShop("category", "Thần kinh não");
             filterType = "category";
             filterValue = "Thần kinh não";
+            applyFilter();
         });
     }
 
@@ -450,7 +465,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         }*/
 
         // 3. Tạo Adapter với click listener
-        productAdapter = new ProductAdapter(this, allProducts, this);
+        productAdapter = new ProductAdapter(this, filteredProducts, this);
 
         // 3. Thiết lập Layout Manager (dạng lưới 2 cột)
         recyclerViewProducts.setLayoutManager(new GridLayoutManager(this, 2));
