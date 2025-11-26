@@ -104,8 +104,8 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         iconNotification = findViewById(R.id.icon_notification);
         notificationBadge = findViewById(R.id.notification_badge);
         textUserGreeting = findViewById(R.id.text_user_greeting);
-        textUserNameProfile = findViewById(R.id.text_user_name_profile);
-        btnLoginHome = findViewById(R.id.btn_login_home);
+        //textUserNameProfile = findViewById(R.id.text_user_name_profile);
+        //btnLoginHome = findViewById(R.id.btn_login_home);
         cardFlashSale = findViewById(R.id.card_flash_sale);
         cardHotSale = findViewById(R.id.card_hot_sale);
         textTimerHours = findViewById(R.id.text_timer_hours);
