@@ -187,7 +187,14 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
                         // Update local data
                         order.setStatus("Đã hủy");
                         notifyItemChanged(getAdapterPosition());
-                        Toast.makeText(context, "Đã hủy đơn hàng #" + order.getOrderId(), Toast.LENGTH_SHORT).show();
+                        
+                        // Show success dialog
+                        new AlertDialog.Builder(context)
+                            .setTitle("Hủy đơn hàng thành công")
+                            .setMessage("Đơn hàng #" + order.getOrderId() + " đã được hủy thành công.\n\nSố tiền sẽ được hoàn lại trong 3-5 ngày làm việc.")
+                            .setPositiveButton("Đồng ý", null)
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .show();
                     } else {
                         Toast.makeText(context, "Lỗi: " + message, Toast.LENGTH_SHORT).show();
                     }
