@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- #FFC107
+         #dee872 -->
+    <color name="primary_color">#FFC107</color>
+    <color name="background">#121212</color>
+
+    <!-- Thumb color -->
+    <color name="thumb_enable_color">#757575</color>
+    <color name="thumb_disable_color">#FFFFFFFF</color>
+
+</resources>

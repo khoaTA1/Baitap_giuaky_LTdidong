@@ -1,0 +1,22 @@
+Variant: debug
+Config: debug
+Store: C:\Users\khoat\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: 50:49:44:56:56:F4:B5:CD:39:01:60:AC:A8:F6:E2:34
+SHA1: 9F:5B:47:0F:7B:84:6F:9E:0B:59:A5:5A:AA:C5:29:0C:70:5E:08:84
+SHA-256: A6:FF:2F:F3:34:2B:E9:D4:9E:E1:04:99:94:6E:56:4F:8B:B1:43:E9:48:7D:6F:D2:A8:F2:9F:5C:4E:BE:BD:20
+Valid until: Friday, October 29, 2055
+----------
+Variant: release
+Config: null
+Store: null
+Alias: null
+----------
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\khoat\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: 50:49:44:56:56:F4:B5:CD:39:01:60:AC:A8:F6:E2:34
+SHA1: 9F:5B:47:0F:7B:84:6F:9E:0B:59:A5:5A:AA:C5:29:0C:70:5E:08:84
+SHA-256: A6:FF:2F:F3:34:2B:E9:D4:9E:E1:04:99:94:6E:56:4F:8B:B1:43:E9:48:7D:6F:D2:A8:F2:9F:5C:4E:BE:BD:20
+Valid until: Friday, October 29, 2055

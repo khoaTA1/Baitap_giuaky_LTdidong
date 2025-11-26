@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="input_cvv" type="id" />
+    <item name="input_expiry_date" type="id" />
+    <item name="input_card_name" type="id" />
+    <item name="button_pay_now" type="id" />
+</resources>
