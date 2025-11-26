@@ -27,7 +27,6 @@
                 android:layout_height="wrap_content"
                 android:background="@color/primary_color"
                 android:orientation="vertical"
-                android:paddingTop="24dp"
                 android:elevation="8dp">
 
                 <!-- Logo và thông báo -->
@@ -130,69 +129,11 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <!-- Banner Quảng Cáo với ViewPager2 -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/banner_view_pager"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <!-- Search bar -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_search"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginHorizontal="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="8dp"
-                    app:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="20dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_search"
-                            android:tint="#6C5CE7" />
-
-                        <EditText
-                            android:id="@+id/edit_search"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:background="@android:color/transparent"
-                            android:hint="Tìm kiếm sản phẩm (VD: vitamin)..."
-                            android:textColorHint="#B2BEC3"
-                            android:textColor="#2D3436"
-                            android:textSize="15sp"
-                            android:imeOptions="actionSearch"
-                            android:inputType="text"
-                            android:maxLines="1"
-                            android:focusable="false"
-                            android:clickable="false"
-                            android:cursorVisible="false"
-                            android:singleLine="true" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Banner Quảng Cáo với ViewPager2 -->
-                <androidx.viewpager2.widget.ViewPager2
-                    android:id="@+id/banner_view_pager"
-                    android:layout_width="match_parent"
-                    android:layout_height="180dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_height="180dp" />
 
             <!-- Indicator cho banner -->
             <LinearLayout
@@ -202,6 +143,52 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="16dp"
                 android:orientation="horizontal" />
+
+            <!-- Search bar -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_search"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginHorizontal="16dp"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@android:color/white"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="20dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_search"
+                        android:tint="#6C5CE7" />
+
+                    <EditText
+                        android:id="@+id/edit_search"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:hint="Tìm kiếm sản phẩm (VD: vitamin)..."
+                        android:textColorHint="#B2BEC3"
+                        android:textColor="#2D3436"
+                        android:textSize="15sp"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:cursorVisible="false"
+                        android:singleLine="true" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Flash Sale and Hot Sale Banners -->
             <LinearLayout
@@ -426,36 +413,36 @@
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
                             android:layout_margin="6dp"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="2dp"
-                            app:strokeWidth="0dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:foreground="?attr/selectableItemBackground">
+                            android:foreground="?attr/selectableItemBackground"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="2dp"
+                            app:strokeWidth="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:background="@drawable/gradient_category_1"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="16dp"
-                                android:background="@drawable/gradient_category_1">
+                                android:padding="16dp">
 
                                 <ImageView
                                     android:layout_width="56dp"
                                     android:layout_height="56dp"
-                                    android:src="@drawable/logo_vitamin"
+                                    android:layout_marginBottom="12dp"
                                     android:scaleType="fitCenter"
-                                    android:layout_marginBottom="12dp" />
+                                    android:src="@drawable/logo_vitamin" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:gravity="center"
                                     android:text="Vitamin"
                                     android:textColor="#FFFFFF"
                                     android:textSize="12sp"
-                                    android:textStyle="bold"
-                                    android:gravity="center" />
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -466,36 +453,36 @@
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
                             android:layout_margin="6dp"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="2dp"
-                            app:strokeWidth="0dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:foreground="?attr/selectableItemBackground">
+                            android:foreground="?attr/selectableItemBackground"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="2dp"
+                            app:strokeWidth="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:background="@drawable/gradient_category_2"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="16dp"
-                                android:background="@drawable/gradient_category_2">
+                                android:padding="16dp">
 
                                 <ImageView
                                     android:layout_width="56dp"
                                     android:layout_height="56dp"
-                                    android:src="@drawable/logo_noitietto"
+                                    android:layout_marginBottom="12dp"
                                     android:scaleType="fitCenter"
-                                    android:layout_marginBottom="12dp" />
+                                    android:src="@drawable/logo_noitietto" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:gravity="center"
                                     android:text="Sinh lý"
                                     android:textColor="#FFFFFF"
                                     android:textSize="12sp"
-                                    android:textStyle="bold"
-                                    android:gravity="center" />
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -506,36 +493,36 @@
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
                             android:layout_margin="6dp"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="2dp"
-                            app:strokeWidth="0dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:foreground="?attr/selectableItemBackground">
+                            android:foreground="?attr/selectableItemBackground"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="2dp"
+                            app:strokeWidth="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:background="@drawable/gradient_category_3"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="16dp"
-                                android:background="@drawable/gradient_category_3">
+                                android:padding="16dp">
 
                                 <ImageView
                                     android:layout_width="56dp"
                                     android:layout_height="56dp"
-                                    android:src="@drawable/logo_health"
+                                    android:layout_marginBottom="12dp"
                                     android:scaleType="fitCenter"
-                                    android:layout_marginBottom="12dp" />
+                                    android:src="@drawable/logo_health" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:gravity="center"
                                     android:text="Tăng cường"
                                     android:textColor="#FFFFFF"
                                     android:textSize="12sp"
-                                    android:textStyle="bold"
-                                    android:gravity="center" />
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -546,36 +533,36 @@
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
                             android:layout_margin="6dp"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="2dp"
-                            app:strokeWidth="0dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:foreground="?attr/selectableItemBackground">
+                            android:foreground="?attr/selectableItemBackground"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="2dp"
+                            app:strokeWidth="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:background="@drawable/gradient_category_4"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="16dp"
-                                android:background="@drawable/gradient_category_4">
+                                android:padding="16dp">
 
                                 <ImageView
                                     android:layout_width="56dp"
                                     android:layout_height="56dp"
-                                    android:src="@drawable/logo_health1"
+                                    android:layout_marginBottom="12dp"
                                     android:scaleType="fitCenter"
-                                    android:layout_marginBottom="12dp" />
+                                    android:src="@drawable/logo_health1" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:gravity="center"
                                     android:text="Điều trị"
                                     android:textColor="#FFFFFF"
                                     android:textSize="12sp"
-                                    android:textStyle="bold"
-                                    android:gravity="center" />
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -586,36 +573,36 @@
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
                             android:layout_margin="6dp"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="2dp"
-                            app:strokeWidth="0dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:foreground="?attr/selectableItemBackground">
+                            android:foreground="?attr/selectableItemBackground"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="2dp"
+                            app:strokeWidth="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:background="@drawable/gradient_category_5"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="16dp"
-                                android:background="@drawable/gradient_category_5">
+                                android:padding="16dp">
 
                                 <ImageView
                                     android:layout_width="56dp"
                                     android:layout_height="56dp"
-                                    android:src="@drawable/logo_stomach"
+                                    android:layout_marginBottom="12dp"
                                     android:scaleType="fitCenter"
-                                    android:layout_marginBottom="12dp" />
+                                    android:src="@drawable/logo_stomach" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:gravity="center"
                                     android:text="Tiêu hóa"
                                     android:textColor="#FFFFFF"
                                     android:textSize="12sp"
-                                    android:textStyle="bold"
-                                    android:gravity="center" />
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -626,36 +613,36 @@
                             android:layout_height="wrap_content"
                             android:layout_columnWeight="1"
                             android:layout_margin="6dp"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="2dp"
-                            app:strokeWidth="0dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:foreground="?attr/selectableItemBackground">
+                            android:foreground="?attr/selectableItemBackground"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="2dp"
+                            app:strokeWidth="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:background="@drawable/gradient_category_6"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="16dp"
-                                android:background="@drawable/gradient_category_6">
+                                android:padding="16dp">
 
                                 <ImageView
                                     android:layout_width="56dp"
                                     android:layout_height="56dp"
-                                    android:src="@drawable/logo_brain"
+                                    android:layout_marginBottom="12dp"
                                     android:scaleType="fitCenter"
-                                    android:layout_marginBottom="12dp" />
+                                    android:src="@drawable/logo_brain" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:gravity="center"
                                     android:text="Thần kinh"
                                     android:textColor="#FFFFFF"
                                     android:textSize="12sp"
-                                    android:textStyle="bold"
-                                    android:gravity="center" />
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
                     </GridLayout>

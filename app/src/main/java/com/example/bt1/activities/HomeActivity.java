@@ -103,7 +103,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         iconFavorites = findViewById(R.id.icon_favorites);
         iconNotification = findViewById(R.id.icon_notification);
         notificationBadge = findViewById(R.id.notification_badge);
-        textUserGreeting = findViewById(R.id.text_user_greeting);
+        //textUserGreeting = findViewById(R.id.text_user_greeting);
         //textUserNameProfile = findViewById(R.id.text_user_name_profile);
         //btnLoginHome = findViewById(R.id.btn_login_home);
         cardFlashSale = findViewById(R.id.card_flash_sale);
@@ -139,7 +139,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         updateNotificationBadge();
         
         // Hiển thị tên người dùng
-        loadUserGreeting();
+        //loadUserGreeting();
 
         // Bắt đầu đếm ngược
         startCountdown();
@@ -212,7 +212,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         // Cập nhật lại số thông báo khi quay lại màn hình này
         updateNotificationBadge();
         // Cập nhật tên người dùng
-        loadUserGreeting();
+        //loadUserGreeting();
         // Cập nhật trạng thái yêu thích trong danh sách sản phẩm
         if (productAdapter != null) {
             productAdapter.notifyDataSetChanged();
