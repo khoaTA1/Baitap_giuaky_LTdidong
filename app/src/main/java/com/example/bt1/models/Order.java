@@ -8,6 +8,7 @@ public class Order {
     private double totalAmount;
     private String status;
     private List<Product> products;  // Đổi từ 'items' thành 'products' để khớp với Firebase
+    private String deliveryAddress;  // Địa chỉ giao hàng
 
     // No-argument constructor required for Firebase Firestore deserialization
     public Order() {
@@ -68,5 +69,13 @@ public class Order {
     
     public void setProducts(List<Product> products) {
         this.products = products;
+    }
+    
+    public String getDeliveryAddress() {
+        return deliveryAddress;
+    }
+    
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
     }
 }

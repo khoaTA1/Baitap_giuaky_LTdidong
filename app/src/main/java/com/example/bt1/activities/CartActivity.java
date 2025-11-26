@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bt1.R;
 import com.example.bt1.models.Product;
 import com.example.bt1.adapters.CartAdapter;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -187,6 +188,43 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
                 startActivity(intent);
             }
         });
+        
+        // Setup bottom navigation
+        setupBottomNavigation();
+    }
+    
+    private void setupBottomNavigation() {
+        // Đánh dấu mục "Cart" là đang được chọn
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_cart);
+            
+            // Gán sự kiện khi một mục được chọn
+            bottomNavigationView.setOnItemSelectedListener(item -> {
+                int itemId = item.getItemId();
+
+                if (itemId == R.id.nav_home) {
+                    android.content.Intent intent = new android.content.Intent(this, HomeActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_setting) {
+                    android.content.Intent intent = new android.content.Intent(this, SettingActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_cart) {
+                    return true;
+                } else if (itemId == R.id.nav_profile) {
+                    android.content.Intent intent = new android.content.Intent(this, ProfileActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                }
+
+                return false;
+            });
+        }
     }
     
     private void saveCartProducts() {
