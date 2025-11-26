@@ -26,7 +26,7 @@
                 android:layout_marginStart="8dp"
                 android:padding="12dp"
                 android:src="@drawable/ic_arrow_back"
-                app:tint="@android:color/white"
+                app:tint="@color/text_primary_inverted"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="Trợ giúp &amp; Hỗ trợ"
-                android:textColor="@android:color/white"
+                android:textColor="@color/text_primary_inverted"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -55,6 +55,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/card_background"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="3dp"
                 app:strokeWidth="0dp">
@@ -93,7 +94,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Tìm câu trả lời nhanh chóng"
-                            android:textColor="@android:color/darker_gray"
+                            android:textColor="@color/text_secondary"
                             android:textSize="14sp" />
                     </LinearLayout>
 
@@ -112,6 +113,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/card_background"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="3dp"
                 app:strokeWidth="0dp">
@@ -150,7 +152,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Gửi yêu cầu hỗ trợ"
-                            android:textColor="@android:color/darker_gray"
+                            android:textColor="@color/text_secondary"
                             android:textSize="14sp" />
                     </LinearLayout>
 
@@ -169,6 +171,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/card_background"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="3dp"
                 app:strokeWidth="0dp">
@@ -207,7 +210,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="support@pharmacystore.com"
-                            android:textColor="@android:color/darker_gray"
+                            android:textColor="@color/text_secondary"
                             android:textSize="14sp" />
                     </LinearLayout>
 
@@ -226,6 +229,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/card_background"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="3dp"
                 app:strokeWidth="0dp">
@@ -264,7 +268,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="0123 456 789"
-                            android:textColor="@android:color/darker_gray"
+                            android:textColor="@color/text_secondary"
                             android:textSize="14sp" />
                     </LinearLayout>
 
@@ -282,6 +286,7 @@
                 android:id="@+id/card_terms"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/card_background"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="3dp"
                 app:strokeWidth="0dp">
@@ -320,7 +325,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Xem điều khoản dịch vụ"
-                            android:textColor="@android:color/darker_gray"
+                            android:textColor="@color/text_secondary"
                             android:textSize="14sp" />
                     </LinearLayout>
 

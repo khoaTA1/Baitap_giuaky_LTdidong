@@ -23,7 +23,7 @@
             android:layout_centerVertical="true"
             android:src="@drawable/ic_arrow_back"
             android:contentDescription="Quay lại"
-            app:tint="@android:color/white" />
+            app:tint="@color/text_primary_inverted" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -36,14 +36,14 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:src="@drawable/ic_flash"
-                app:tint="@android:color/white"
+                app:tint="@color/text_primary_inverted"
                 android:layout_marginEnd="8dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="HOT SALE"
-                android:textColor="@android:color/white"
+                android:textColor="@color/text_primary_inverted"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -57,7 +57,7 @@
             android:layout_centerVertical="true"
             android:src="@drawable/ic_search"
             android:contentDescription="Tìm kiếm"
-            app:tint="@android:color/white" />
+            app:tint="@color/text_primary_inverted" />
 
     </RelativeLayout>
 
@@ -82,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Giảm giá sốc trong thời gian có hạn!"
-                android:textColor="@android:color/white"
+                android:textColor="@color/text_primary_inverted"
                 android:textSize="14sp"
                 android:layout_marginBottom="12dp" />
 
@@ -99,7 +99,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Kết thúc sau:"
-                    android:textColor="#333333"
+                    android:textColor="@color/text_primary"
                     android:textSize="12sp"
                     android:layout_marginEnd="8dp" />
 
@@ -118,7 +118,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=":"
-                    android:textColor="#333333"
+                    android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:layout_marginHorizontal="4dp" />
@@ -138,7 +138,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=":"
-                    android:textColor="#333333"
+                    android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:layout_marginHorizontal="4dp" />
@@ -181,6 +181,7 @@
             android:textColor="@color/text_primary_inverted"
             android:backgroundTint="@color/primary_color"
             app:icon="@drawable/ic_category"
+            android:drawableTint="@color/text_primary_inverted"
             app:strokeColor="#E0E0E0" />
 
         <Button
@@ -192,6 +193,7 @@
             android:text="Giá"
             android:backgroundTint="@color/primary_color"
             android:textColor="@color/text_primary_inverted"
+            android:drawableTint="@color/text_primary_inverted"
             app:icon="@drawable/ic_price"
             app:strokeColor="#E0E0E0" />
 

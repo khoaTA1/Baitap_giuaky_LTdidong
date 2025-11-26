@@ -26,7 +26,7 @@
                 android:layout_marginStart="8dp"
                 android:padding="12dp"
                 android:src="@drawable/ic_arrow_back"
-                app:tint="@android:color/white"
+                app:tint="@color/text_primary_inverted"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="Câu hỏi thường gặp"
-                android:textColor="@android:color/white"
+                android:textColor="@color/text_primary_inverted"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -77,7 +77,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="Bạn có thể đặt hàng bằng cách:\n1. Chọn sản phẩm muốn mua\n2. Thêm vào giỏ hàng\n3. Tiến hành thanh toán\n4. Nhập thông tin giao hàng\n5. Xác nhận đơn hàng"
-                        android:textColor="#666666"
+                        android:textColor="@color/text_secondary"
                         android:textSize="14sp"
                         android:lineSpacingExtra="4dp" />
 
@@ -113,7 +113,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="- Nội thành: 1-2 ngày làm việc\n- Ngoại thành: 3-5 ngày làm việc\n- Miền Trung/Nam: 5-7 ngày làm việc"
-                        android:textColor="#666666"
+                        android:textColor="@color/text_secondary"
                         android:textSize="14sp"
                         android:lineSpacingExtra="4dp" />
 
@@ -149,7 +149,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="- Đổi trả trong vòng 7 ngày kể từ ngày nhận hàng\n- Sản phẩm còn nguyên seal, chưa qua sử dụng\n- Có hóa đơn mua hàng\n- Miễn phí vận chuyển đổi trả"
-                        android:textColor="#666666"
+                        android:textColor="@color/text_secondary"
                         android:textSize="14sp"
                         android:lineSpacingExtra="4dp" />
 
@@ -185,7 +185,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="- Thanh toán khi nhận hàng (COD)\n- Chuyển khoản ngân hàng\n- Ví điện tử (MoMo, ZaloPay)\n- Thẻ tín dụng/ghi nợ"
-                        android:textColor="#666666"
+                        android:textColor="@color/text_secondary"
                         android:textSize="14sp"
                         android:lineSpacingExtra="4dp" />
 
@@ -220,7 +220,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="100% sản phẩm chính hãng, có tem phụ, đầy đủ giấy tờ xuất xứ. Chúng tôi cam kết hoàn tiền 200% nếu phát hiện hàng giả."
-                        android:textColor="#666666"
+                        android:textColor="@color/text_secondary"
                         android:textSize="14sp"
                         android:lineSpacingExtra="4dp" />
 
