@@ -157,7 +157,7 @@
             app:cardCornerRadius="12dp"
             app:cardBackgroundColor="#E8F4FD"
             app:cardElevation="0dp"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <LinearLayout
                 android:id="@+id/current_filter_layout"
@@ -228,7 +228,7 @@
         app:cardCornerRadius="20dp"
         app:cardBackgroundColor="@android:color/white"
         app:cardElevation="4dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
