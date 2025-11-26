@@ -450,7 +450,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         }*/
 
         // 3. Tạo Adapter với click listener
-        productAdapter = new ProductAdapter(this, productList, this);
+        productAdapter = new ProductAdapter(this, allProducts, this);
 
         // 3. Thiết lập Layout Manager (dạng lưới 2 cột)
         recyclerViewProducts.setLayoutManager(new GridLayoutManager(this, 2));
@@ -537,7 +537,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
             } else {
                 productAdapter.notifyDataSetChanged();
             }
-            Log.d(">>> HomeActivity", "Load lại sản phẩm từ cache SQLite, số lượng: " + productList.size());
+            Log.d(">>> HomeActivity", "Load lại sản phẩm từ cache SQLite, số lượng: " + allProducts.size());
             return;
         }
 
@@ -657,7 +657,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
                     String searchQuery = newText.toLowerCase().trim();
                     
                     // First pass: Find products where NAME matches (higher priority)
-                    for (Product product : productList) {
+                    for (Product product : allProducts) {
                         if (product.getName() != null && 
                             product.getName().toLowerCase().contains(searchQuery)) {
                             suggestions.add(product);
@@ -667,7 +667,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
                     
                     // Second pass: If still need more, find by CATEGORY
                     if (suggestions.size() < 3) {
-                        for (Product product : productList) {
+                        for (Product product : allProducts) {
                             if (suggestions.size() >= 3) break;
                             // Skip if already added (name match)
                             if (suggestions.contains(product)) continue;
