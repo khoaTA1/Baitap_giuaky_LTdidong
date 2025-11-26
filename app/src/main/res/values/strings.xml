@@ -1,0 +1,114 @@
+<resources>
+    <string name="app_name">bt1</string>
+
+    <!-- một số nhãn và tiêu đề dùng chung -->
+    <string name="category_label">Danh mục</string>
+    <string name="passinput_label">Mật khẩu</string>
+
+    <!-- các nhãn trong thanh điều hướng phía dưới -->
+    <string name="homepage_nav_item_label">Trang chủ</string>
+    <string name="cart_nav_item_label">Giỏ hàng</string>
+    <string name="user_nav_item_label">Cá nhân</string>
+
+    <!-- các nhãn/tiêu đề cho trang chủ -->
+    <string name="above_recyclerview_home_title">Sản phẩm nổi bật</string>
+    <string name="search_bar_label">Tìm kiếm sản phẩm...</string>
+    <string name="banner_label">Quảng cáo</string>
+
+    <!-- các nhãn/tiêu đề trang đăng ký -->
+    <string name="welcome">Chào mừng!</string>
+    <string name="register_label">Tạo tài khoản để bắt đầu</string>
+    <string name="register_req">Thông tin đăng ký</string>
+    <string name="userinput_register_label">Tên người dùng</string>
+    <string name="emailinput_register_label">Địa chỉ Email</string>
+    <string name="confirmpass_register_label">Xác nhận Mật khẩu</string>
+    <string name="btn_register_label">Đăng ký ngay</string>
+    <string name="redirectlogin_label">"Đã có tài khoản? "</string>
+    <string name="btn_redirectlogin_label">Đăng nhập</string>
+    <string name="register_law">• Mật khẩu phải có ít nhất 6 ký tự</string>
+
+
+    <!-- các nhãn/tiêu đề trang đăng nhập -->
+    <string name="login_label">Chào mừng!</string>
+    <string name="login_req">Đăng nhập để khám phá ngay</string>
+    <string name="emailuserinput_login_label">Địa chỉ Email</string>
+    <string name="forgotpass_login_label">Quên mật khẩu?</string>
+    <string name="btn_login_label">Đăng nhập</string>
+    <string name="redirectregister_label">"Chưa có tài khoản? "</string>
+    <string name="btn_redirectregister_label"> Đăng ký ngay</string>
+    <string name="welcome_to_app">Chào mừng trở lại!</string>
+    <string name="welcome_to_app1">Đăng nhập để tiếp tục mua sắm</string>
+
+    <!-- các nhãn/tiêu đề trang quên mật khẩu -->
+    <string name="forgotpass_title">Quên mật khẩu?</string>
+    <string name="forgotpass_subtitle">Đừng lo lắng, chúng tôi sẽ giúp bạn lấy lại</string>
+    <string name="forgotpass_info">Nhập địa chỉ email của bạn và chúng tôi sẽ gửi mật khẩu mới</string>
+    <string name="btn_send_reset">Gửi yêu cầu</string>
+    <string name="back_to_login_label">Quay lại </string>
+    <string name="comment_input_hint">Nhập bình luận của bạn</string>
+    <string name="comment_send_btn_label">Gửi đánh giá</string>
+
+    <!-- các nhãn trang chủ mới -->
+    <string name="black_friday_notification">● Black Fire-Day 2025 sắp trở lại - Mua sắm ngay!</string>
+    <string name="phone_logo">SupplementStore</string>
+    <string name="search_hint">Bạn muốn mua gì hôm nay?</string>
+    <string name="user_name">Lê Thành Nhân</string>
+    <string name="s_member_badge">S-MEM</string>
+    <string name="s_student_badge">S-Student</string>
+    <string name="total_accumulated">Tổng tiền tích lũy: 37.245.000đ</string>
+    <string name="membership_level">Hạng thành viên</string>
+    <string name="discount_codes">Mã giảm giá</string>
+    <string name="purchase_history">Lịch sử mua hàng</string>
+    <string name="student_program">S-Student</string>
+    <string name="flash_sale">FLASHSALE</string>
+    <string name="hot_sale">HOTSALE</string>
+    <string name="time_period_1">9h - 11h 08/11</string>
+    <string name="time_period_2">9h - 11h 09/11</string>
+    <string name="countdown_label">BẮT ĐẦU SAU:</string>
+    <string name="installment_0_percent">Trả góp 0%</string>
+    <string name="discount_13_percent">Giảm 13%</string>
+    <string name="pre_order_status">Hàng đặt trước</string>
+    <string name="student_price_format">Giá S-Student %s</string>
+
+    <!-- các nhãn trang category -->
+    <string name="category_page_title">Danh mục sản phẩm</string>
+    <string name="search_category_hint">Tìm kiếm danh mục...</string>
+    <string name="phone_brands_title">Danh mục thực phẩm chức năng</string>
+    <string name="price_ranges_title">Phân khúc giá</string>
+    <string name="view_all">Xem tất cả ></string>
+    
+    <!-- Price ranges -->
+    <string name="price_under_5m_title">Dưới 200 nghìn</string>
+    <string name="price_under_5m_desc">Thực phẩm chức năng giá rẻ</string>
+    <string name="price_5m_10m_title">200k - 500k</string>
+    <string name="price_5m_10m_desc">Tầm trung, chất lượng tốt</string>
+    <string name="price_10m_20m_title">500k - 1 triệu</string>
+    <string name="price_10m_20m_desc">Cao cấp, nhập khẩu</string>
+    <string name="price_above_20m_title">Trên 1 triệu</string>
+    <string name="price_above_20m_desc">Premium, hiệu quả cao</string>
+
+    <!-- Product counts -->
+    <string name="products_count_format">%d sản phẩm</string>
+
+    <!-- các nhãn/tiêu đề trang thông số chi tiết sản phẩm -->
+    <string name="product_spec_title">Thông tin sản phẩm</string>
+    <string name="buy_button_label">Mua sản phẩm</string>
+    <string name="cart_button_label">Thêm vào giỏ hàng</string>
+    <string name="product_comment_title">Đánh giá sản phẩm</string>
+
+    <!-- một số nhãn/tiêu đề phần cài đặt -->
+    <string name="setting_title">Cài đặt ứng dụng</string>
+    <string name="appearance_setting_title">Giao diện</string>
+    <string name="st_appearance_setting">Nền tối</string>
+    <string name="nd_appearance_setting">Cỡ chữ</string>
+    <string name="feature_setting_title">Thông báo</string>
+    <string name="st_notifications_setting">Bật/tắt thông báo</string>
+    <string name="nd_notifications_setting">Rung khi thông báo</string>
+    <string name="account_setting_title">Tài khoản</string>
+    <string name="st_account_setting">Mật khẩu</string>
+    <string name="nd_account_setting">Phương thức thanh toán</string>
+    <string name="rd_account_setting">Xóa tài khoản</string>
+    <string name="app_info_title">Về ứng dụng</string>
+    <string name="version_info">Phiên bản</string>
+
+</resources>

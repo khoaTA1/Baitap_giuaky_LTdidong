@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="HealthyMulti"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Bt1"
+        android:name=".activities.CloseApp">
+        <activity
+            android:name=".activities.HomeActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.MainActivity" />
+        <activity android:name=".activities.RegisterActivity" />
+        <activity android:name=".activities.ForgotPasswordActivity" />
+        <activity android:name=".activities.ProfileActivity" />
+        <activity android:name=".activities.CategoryActivity" />
+        <activity android:name=".activities.HotSaleActivity" />
+        <activity android:name=".activities.FavoriteActivity" />
+        <activity android:name=".activities.PaymentActivity" />
+        <activity android:name=".activities.ShopActivity" />
+        <activity android:name=".activities.ProductDetailActivity" />
+        <activity android:name=".activities.CartActivity" />
+        <activity android:name=".activities.NotificationActivity" />
+        <activity android:name=".activities.OrderHistoryActivity" />
+        <activity android:name=".activities.SettingActivity" />
+        <activity android:name=".activities.UpdateInfoActivity" />
+        <activity android:name=".activities.HelpSupportActivity" />
+        <activity android:name=".activities.FaqActivity" />
+        <activity android:name=".activities.ContactActivity" />
+        <activity android:name=".activities.TermsActivity" />
+        <activity android:name=".activities.PrivacyActivity" />
+        <activity android:name=".activities.ManageProductsActivity" />
+        <activity android:name=".activities.ManageOrdersActivity" />
+        <activity android:name=".activities.ManageUsersActivity" />
+        <activity android:name=".activities.StatisticsActivity" />
+        <!-- Các Activity sau sẽ thêm sau khi tạo file:
+        <activity android:name=".activities.CartActivity" />
+        <activity android:name=".activities.OrderActivity" />
+        <activity android:name=".activities.OrderHistoryActivity" />
+        <activity android:name=".activities.SearchActivity" />
+        -->
+    </application>
+
+</manifest>
