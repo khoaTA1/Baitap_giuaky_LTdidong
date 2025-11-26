@@ -146,14 +146,14 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
             // Handle cancel button click
             btnCancelOrder.setOnClickListener(v -> showCancelDialog(order));
             
-            // Handle confirm button click (admin only)
+            // Giải pháp nút Xác nhận đơn hàng (dành cho admin)
             btnConfirmOrder.setOnClickListener(v -> {
                 if (actionListener != null) {
                     actionListener.onConfirmOrder(order, getAdapterPosition());
                 }
             });
             
-            // Handle reorder button click
+            // Giải pháp nút Mua lại
             btnReorder.setOnClickListener(v -> reorder(order));
         }
 
@@ -179,16 +179,16 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
         }
 
         private void cancelOrder(Order order) {
-            // Update status in Firebase
+            // Cập nhật trạng thái đơn hàng trong Firestore
             orderRepo.updateOrderStatus(order.getOrderId(), "Đã hủy", new OrderRepo.OnCompleteListener() {
                 @Override
                 public void onComplete(boolean success, String message) {
                     if (success) {
-                        // Update local data
+                        // Cập nhật trạng thái đơn hàng trong giao diện
                         order.setStatus("Đã hủy");
                         notifyItemChanged(getAdapterPosition());
                         
-                        // Show success dialog
+                        // Thông báo hủy đơn hàng thành công cho người dùng
                         new AlertDialog.Builder(context)
                             .setTitle("Hủy đơn hàng thành công")
                             .setMessage("Đơn hàng #" + order.getOrderId() + " đã được hủy thành công.\n\nSố tiền sẽ được hoàn lại trong 3-5 ngày làm việc.")
@@ -209,7 +209,7 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
                 return;
             }
 
-            // Create intent for PaymentActivity
+            // Tạo intent cho PaymentActivity
             Intent intent = new Intent(context, PaymentActivity.class);
 
             // Pass data to PaymentActivity
