@@ -575,8 +575,8 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
 
             if (itemId == R.id.nav_home) {
                 return true;
-            } else if (itemId == R.id.nav_categories) {
-                Intent intent = new Intent(this, CategoryActivity.class);
+            } else if (itemId == R.id.nav_setting) {
+                Intent intent = new Intent(this, SettingActivity.class);
                 startActivity(intent);
                 finish();
                 return true;

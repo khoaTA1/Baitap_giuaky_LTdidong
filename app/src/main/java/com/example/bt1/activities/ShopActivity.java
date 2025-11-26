@@ -548,17 +548,19 @@ public class ShopActivity extends AppCompatActivity implements ProductAdapter.On
     }
 
     private void setupBottomNavigation() {
-        bottomNavigationView.setSelectedItemId(R.id.nav_categories);
+        // Đánh dấu mục "Home" là đang được chọn khi khởi động
+        bottomNavigationView.setSelectedItemId(R.id.nav_home);
 
+        // Gán sự kiện khi một mục được chọn
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
             if (itemId == R.id.nav_home) {
-                Intent intent = new Intent(this, HomeActivity.class);
+                return true;
+            } else if (itemId == R.id.nav_setting) {
+                Intent intent = new Intent(this, SettingActivity.class);
                 startActivity(intent);
                 finish();
-                return true;
-            } else if (itemId == R.id.nav_categories) {
                 return true;
             } else if (itemId == R.id.nav_cart) {
                 Intent intent = new Intent(this, CartActivity.class);

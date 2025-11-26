@@ -49,7 +49,7 @@ public class CategoryActivity extends AppCompatActivity {
         setupViewAllClickListeners();
 
         // Thiết lập bottom navigation
-        setupBottomNavigation();
+        //setupBottomNavigation();
     }
 
     private void initViews() {
@@ -151,6 +151,7 @@ public class CategoryActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /*
     private void setupBottomNavigation() {
         // Đánh dấu mục "Categories" là đang được chọn
         bottomNavigationView.setSelectedItemId(R.id.nav_categories);
@@ -179,5 +180,5 @@ public class CategoryActivity extends AppCompatActivity {
 
             return false;
         });
-    }
+    }*/
 }
