@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.bt1.R;
 import com.example.bt1.utils.Notify;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
@@ -96,6 +97,9 @@ public class SettingActivity extends AppCompatActivity {
 
             updateSwitchColor(vibrateOnNotifySwitch, isChecked);
         });
+        
+        // Setup bottom navigation
+        setupBottomNavigation();
     }
 
     // Hàm cập nhật màu của switch dựa trên trạng thái bật/tắt
@@ -108,5 +112,39 @@ public class SettingActivity extends AppCompatActivity {
         Intent intent = new android.content.Intent(this, HomeActivity.class);
         startActivity(intent);
         finish();
+    }
+    
+    private void setupBottomNavigation() {
+        // Đánh dấu mục "Setting" là đang được chọn
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_setting);
+            
+            // Gán sự kiện khi một mục được chọn
+            bottomNavigationView.setOnItemSelectedListener(item -> {
+                int itemId = item.getItemId();
+
+                if (itemId == R.id.nav_home) {
+                    Intent intent = new Intent(this, HomeActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_setting) {
+                    return true;
+                } else if (itemId == R.id.nav_cart) {
+                    Intent intent = new Intent(this, CartActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_profile) {
+                    Intent intent = new Intent(this, ProfileActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                }
+
+                return false;
+            });
+        }
     }
 }

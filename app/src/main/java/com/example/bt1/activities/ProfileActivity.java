@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.bt1.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.imageview.ShapeableImageView;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -75,6 +76,43 @@ public class ProfileActivity extends AppCompatActivity {
         }
         
         backButton.setOnClickListener(v -> goToHome());
+        
+        // Setup bottom navigation
+        setupBottomNavigation();
+    }
+    
+    private void setupBottomNavigation() {
+        // Đánh dấu mục "Profile" là đang được chọn
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_profile);
+            
+            // Gán sự kiện khi một mục được chọn
+            bottomNavigationView.setOnItemSelectedListener(item -> {
+                int itemId = item.getItemId();
+
+                if (itemId == R.id.nav_home) {
+                    Intent intent = new Intent(this, HomeActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_setting) {
+                    Intent intent = new Intent(this, SettingActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_cart) {
+                    Intent intent = new Intent(this, CartActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_profile) {
+                    return true;
+                }
+
+                return false;
+            });
+        }
     }
 
     private void loadProfileData() {

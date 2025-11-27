@@ -52,6 +52,8 @@
         <activity android:name=".activities.ManageOrdersActivity" />
         <activity android:name=".activities.ManageUsersActivity" />
         <activity android:name=".activities.StatisticsActivity" />
+        <activity android:name=".activities.DeliveryAddressesActivity" />
+        <activity android:name=".activities.AddEditAddressActivity" />
         <!-- Các Activity sau sẽ thêm sau khi tạo file:
         <activity android:name=".activities.CartActivity" />
         <activity android:name=".activities.OrderActivity" />

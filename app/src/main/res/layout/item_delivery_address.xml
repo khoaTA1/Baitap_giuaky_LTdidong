@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="2dp"
+    app:strokeColor="@android:color/transparent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header with label and actions -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/text_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Nhà"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary_color"
+                android:drawableStart="@drawable/baseline_home_24"
+                android:drawablePadding="8dp"
+                android:drawableTint="@color/text_primary" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_default"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="Mặc định"
+                android:textSize="12sp"
+                android:visibility="gone"
+                app:chipBackgroundColor="@color/primary_color"
+                app:chipCornerRadius="16dp"
+                android:textColor="@color/text_primary_inverted"
+                app:chipMinHeight="32dp" />
+
+            <ImageView
+                android:id="@+id/btn_edit"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/baseline_edit_24"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="6dp"
+                app:tint="@color/icon_color" />
+
+            <ImageView
+                android:id="@+id/btn_delete"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="4dp"
+                android:src="@drawable/baseline_delete_24"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="6dp"
+                app:tint="#FF6B6B" />
+        </LinearLayout>
+
+        <!-- Recipient Info -->
+        <TextView
+            android:id="@+id/text_recipient_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Nguyễn Văn A"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:id="@+id/text_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="0123456789"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:drawableStart="@drawable/baseline_phone_24"
+            android:drawablePadding="6dp"
+            android:drawableTint="@color/icon_color" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="#E0E0E0" />
+
+        <!-- Address -->
+        <TextView
+            android:id="@+id/text_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:drawableStart="@drawable/baseline_location_on_24"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/icon_color"
+            android:lineSpacingExtra="4dp" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -83,4 +83,13 @@ public abstract class ProductDetailsAbstract {
     public static class CommentInput extends ProductDetailsAbstract {
         public CommentInput() {}
     }
+    
+    public static class SimilarProductsSection extends ProductDetailsAbstract {
+        public List<Product> similarProducts;
+        public Long currentProductId;
+        public SimilarProductsSection(List<Product> similarProducts, Long currentProductId) {
+            this.similarProducts = similarProducts;
+            this.currentProductId = currentProductId;
+        }
+    }
 }

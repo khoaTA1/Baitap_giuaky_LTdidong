@@ -143,6 +143,39 @@ public class ProductRepo {
                 .addOnSuccessListener(aVoid -> Log.d(">>> Firestore", "Xóa sản phẩm thành công: " + docId))
                 .addOnFailureListener(e -> Log.e("!!! Firestore", "Sản phẩm chưa được xóa: " + docId));
     }
+    
+    // GET PRODUCT BY ID
+    public void getProductById(long productId, FireStoreCallBack callback) {
+        String docId = String.valueOf(productId);
+        
+        db.collection(COLLECTION_NAME)
+                .document(docId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Product product = documentSnapshot.toObject(Product.class);
+                        if (product != null) {
+                            try {
+                                product.setId(Long.parseLong(documentSnapshot.getId()));
+                            } catch (NumberFormatException e) {
+                                Log.e(">>> ProductRepo", "Cannot parse document ID: " + documentSnapshot.getId(), e);
+                            }
+                            callback.returnResult(product);
+                            Log.d(">>> ProductRepo", "Loaded product with ID: " + productId);
+                        } else {
+                            callback.returnResult(null);
+                            Log.e(">>> ProductRepo", "Product is null after deserialization");
+                        }
+                    } else {
+                        callback.returnResult(null);
+                        Log.e(">>> ProductRepo", "Product not found with ID: " + productId);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    callback.returnResult(null);
+                    Log.e(">>> ProductRepo", "Error loading product with ID: " + productId, e);
+                });
+    }
 
 
 }

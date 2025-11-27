@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class Product implements Serializable {
     //@Id
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    // Exclude from Firebase deserialization - set manually from document ID
     private Long id;
 
     //@Column(nullable = false)

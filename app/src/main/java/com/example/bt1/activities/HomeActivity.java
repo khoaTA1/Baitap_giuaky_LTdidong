@@ -775,6 +775,58 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
                 startActivity(intent);
             });
         }
+        
+        // Setup category click listeners
+        setupCategoryClickListeners();
+    }
+    
+    private void setupCategoryClickListeners() {
+        // Vitamin
+        findViewById(R.id.brand_iphone).setOnClickListener(v -> {
+            openShopWithFilter("Vitamin & Khoáng chất");
+        });
+        
+        // Sinh lý
+        findViewById(R.id.brand_samsung).setOnClickListener(v -> {
+            openShopWithFilter("Sinh lý - Nội tiết tố");
+        });
+        
+        // Tăng cường
+        findViewById(R.id.brand_xiaomi).setOnClickListener(v -> {
+            openShopWithFilter("Cải thiện tăng cường chức năng");
+        });
+        
+        // Điều trị
+        findViewById(R.id.brand_oppo).setOnClickListener(v -> {
+            openShopWithFilter("Hỗ trợ điều trị");
+        });
+        
+        // Tiêu hóa
+        findViewById(R.id.brand_vivo).setOnClickListener(v -> {
+            openShopWithFilter("Hỗ trợ tiêu hóa");
+        });
+        
+        // Thần kinh
+        findViewById(R.id.brand_realme).setOnClickListener(v -> {
+            openShopWithFilter("Thần kinh não");
+        });
+        
+        // Xem tất cả danh mục
+        TextView textViewAllBrands = findViewById(R.id.text_view_all_brands);
+        if (textViewAllBrands != null) {
+            textViewAllBrands.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ShopActivity.class);
+                intent.putExtra("filter_type", "all");
+                startActivity(intent);
+            });
+        }
+    }
+    
+    private void openShopWithFilter(String category) {
+        Intent intent = new Intent(this, ShopActivity.class);
+        intent.putExtra("filter_type", "category");
+        intent.putExtra("filter_value", category);
+        startActivity(intent);
     }
 
     @Override

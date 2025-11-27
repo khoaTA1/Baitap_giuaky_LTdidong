@@ -1,6 +1,7 @@
 package com.example.bt1.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bt1.R;
+import com.example.bt1.activities.ProductDetailActivity;
 import com.example.bt1.models.ProductDetailsAbstract;
 import com.example.bt1.utils.RenderImage;
 
@@ -40,6 +43,7 @@ public class ProductDetailsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private static final int comment_title_view = 5;
     private static final int comment_input = 6;
     private static final int comment_view = 7;
+    private static final int similar_products_view = 8;
 
     // tạo callback cho activity
     public interface OnCommentSendListener {
@@ -66,6 +70,8 @@ public class ProductDetailsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             return comment_title_view;
         } else if (viewEle instanceof ProductDetailsAbstract.CommentInput) {
             return comment_input;
+        } else if (viewEle instanceof ProductDetailsAbstract.SimilarProductsSection) {
+            return similar_products_view;
         } else {
             return comment_view;
         }
@@ -88,6 +94,8 @@ public class ProductDetailsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 return new CommentTitleViewHolder(inflater.inflate(R.layout.product_comment_title_sublayout, parent, false));
             case comment_input:
                 return new CommentInputViewHolder(inflater.inflate(R.layout.product_comment_input_sublayout, parent, false));
+            case similar_products_view:
+                return new SimilarProductsViewHolder(inflater.inflate(R.layout.item_similar_products, parent, false), context);
             default:
                 return new CommentViewHolder(inflater.inflate(R.layout.product_comment_list_sublayout, parent, false));
         }
@@ -111,6 +119,8 @@ public class ProductDetailsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             ((CommentTitleViewHolder) holder).bind((ProductDetailsAbstract.CommentTitle) item);
         } else if (holder instanceof CommentInputViewHolder) {
             ((CommentInputViewHolder) holder).bind(commentSendListener);
+        } else if (holder instanceof SimilarProductsViewHolder) {
+            ((SimilarProductsViewHolder) holder).bind((ProductDetailsAbstract.SimilarProductsSection) item);
         }
     }
 
@@ -276,6 +286,27 @@ public class ProductDetailsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     Toast.makeText(v.getContext(), "Vui lòng nhập bình luận và chọn sao", Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+    }
+    
+    static class SimilarProductsViewHolder extends RecyclerView.ViewHolder {
+        RecyclerView recyclerSimilarProducts;
+        Context context;
+
+        SimilarProductsViewHolder(View itemView, Context context) {
+            super(itemView);
+            this.context = context;
+            recyclerSimilarProducts = itemView.findViewById(R.id.recycler_similar_products);
+            recyclerSimilarProducts.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+        }
+
+        void bind(ProductDetailsAbstract.SimilarProductsSection section) {
+            ProductAdapter adapter = new ProductAdapter(context, section.similarProducts, product -> {
+                Intent intent = new Intent(context, ProductDetailActivity.class);
+                intent.putExtra("product_id", product.getId());
+                context.startActivity(intent);
+            });
+            recyclerSimilarProducts.setAdapter(adapter);
         }
     }
 }

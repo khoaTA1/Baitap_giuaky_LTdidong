@@ -25,6 +25,7 @@ public class UpdateInfoActivity extends AppCompatActivity {
     private TextInputEditText editTextFullName, editTextEmail, editTextPhone, editTextAddress;
     private TextInputEditText editTextCurrentPassword, editTextNewPassword, editTextConfirmPassword;
     private Button btnSaveChanges;
+    private com.google.android.material.button.MaterialButton btnManageAddresses;
     private SharedPreferencesManager prefsManager;
     private FirebaseFirestore db;
 
@@ -51,6 +52,7 @@ public class UpdateInfoActivity extends AppCompatActivity {
         textInputNewPassword = findViewById(R.id.text_input_new_password);
         textInputConfirmPassword = findViewById(R.id.text_input_confirm_password);
         btnSaveChanges = findViewById(R.id.btn_save_changes);
+        btnManageAddresses = findViewById(R.id.btn_manage_addresses);
 
         if (textInputFullName.getEditText() != null) {
             editTextFullName = (TextInputEditText) textInputFullName.getEditText();
@@ -94,6 +96,11 @@ public class UpdateInfoActivity extends AppCompatActivity {
             if (validateInputs()) {
                 saveUserData();
             }
+        });
+        
+        btnManageAddresses.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, DeliveryAddressesActivity.class);
+            startActivity(intent);
         });
     }
 
