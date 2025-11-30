@@ -2,6 +2,8 @@ package com.example.bt1.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -286,10 +288,12 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
     
     @Override
     public void onSelectionChanged() {
-        if (cartAdapter != null) {
-            checkboxSelectAll.setChecked(cartAdapter.areAllSelected());
-        }
-        updateUI();
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (cartAdapter != null) {
+                checkboxSelectAll.setChecked(cartAdapter.areAllSelected());
+            }
+            updateUI();
+        });
     }
 
     @Override

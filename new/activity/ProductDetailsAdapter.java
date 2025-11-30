@@ -109,17 +109,25 @@ public class ProductDetailsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     static class PreviewViewHolder extends RecyclerView.ViewHolder {
-        TextView textName, textPrice;
+        TextView textName, textPrice, textSoldCount;
 
         PreviewViewHolder(@NonNull View itemView) {
             super(itemView);
             textName = itemView.findViewById(R.id.text_product_name);
             textPrice = itemView.findViewById(R.id.text_product_price);
+            textSoldCount = itemView.findViewById(R.id.text_sold_count_detail);
         }
 
         void bind(ProductDetailsAbstract.ProductPreview preview) {
             textName.setText(preview.productName);
             textPrice.setText(preview.productPrice);
+            
+            if (preview.soldCount > 0) {
+                textSoldCount.setVisibility(View.VISIBLE);
+                textSoldCount.setText("Đã bán: " + preview.soldCount);
+            } else {
+                textSoldCount.setVisibility(View.GONE);
+            }
         }
     }
 

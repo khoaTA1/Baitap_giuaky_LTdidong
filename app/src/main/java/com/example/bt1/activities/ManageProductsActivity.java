@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bt1.R;
 import com.example.bt1.adapters.ManageProductAdapter;
 import com.example.bt1.models.Product;
+import com.example.bt1.repositories.ProductRepo;
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -84,7 +85,18 @@ public class ManageProductsActivity extends AppCompatActivity {
                 
                 for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                     Product product = document.toObject(Product.class);
-                    product.setId(Long.parseLong(document.getId()));
+                    
+                    // Lưu Firestore document ID gốc
+                    String docId = document.getId();
+                    product.setDocumentId(docId);
+                    
+                    // Xử lý ID: có thể là số hoặc string auto-generated
+                    try {
+                        product.setId(Long.parseLong(docId));
+                    } catch (NumberFormatException e) {
+                        // Nếu document ID là string, dùng hashCode làm ID số
+                        product.setId((long) docId.hashCode());
+                    }
                     
                     // Kiểm tra tồn kho
                     Integer stock = product.getStock();
@@ -102,6 +114,9 @@ public class ManageProductsActivity extends AppCompatActivity {
                 tvTotalProducts.setText(String.valueOf(totalProducts));
                 tvInStock.setText(String.valueOf(inStock));
                 tvOutOfStock.setText(String.valueOf(outOfStock));
+                
+                // ⭐ KIỂM TRA SẢN PHẨM SẮP HẾT HÀNG
+                checkLowStockProducts(allProducts);
                 
                 if (allProducts.isEmpty()) {
                     emptyState.setVisibility(View.VISIBLE);
@@ -123,6 +138,43 @@ public class ManageProductsActivity extends AppCompatActivity {
                 Log.e("ManageProducts", "Error loading products", e);
                 Toast.makeText(this, "Lỗi tải danh sách sản phẩm: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             });
+    }
+    
+    /**
+     * ⭐ CẢNH BÁO SẢN PHẨM SẮP HẾT HÀNG (LOW STOCK)
+     */
+    private void checkLowStockProducts(List<Product> products) {
+        List<Product> lowStockProducts = new ArrayList<>();
+        final int LOW_STOCK_THRESHOLD = 10; // Ngưỡng cảnh báo: dưới 10 sản phẩm
+        
+        for (Product p : products) {
+            Integer stock = p.getStock();
+            if (stock != null && stock > 0 && stock < LOW_STOCK_THRESHOLD) {
+                lowStockProducts.add(p);
+            }
+        }
+        
+        if (!lowStockProducts.isEmpty()) {
+            StringBuilder message = new StringBuilder("⚠️ Cảnh báo tồn kho thấp:\n\n");
+            for (Product p : lowStockProducts) {
+                message.append("• ").append(p.getName())
+                       .append(": ").append(p.getStock()).append(" sản phẩm\n");
+            }
+            
+            new android.app.AlertDialog.Builder(this)
+                .setTitle("🔔 Sản phẩm sắp hết hàng")
+                .setMessage(message.toString())
+                .setPositiveButton("Đã hiểu", null)
+                .setNegativeButton("Xem chi tiết", (dialog, which) -> {
+                    // Scroll to first low stock product
+                    if (!lowStockProducts.isEmpty()) {
+                        recyclerProducts.smoothScrollToPosition(0);
+                    }
+                })
+                .show();
+            
+            Log.w("ManageProducts", "Found " + lowStockProducts.size() + " low stock products");
+        }
     }
     
     private void showProductMenu(Product product) {
@@ -207,6 +259,10 @@ public class ManageProductsActivity extends AppCompatActivity {
         EditText editDosageForm = dialogView.findViewById(R.id.edit_dosage_form);
         EditText editInclude = dialogView.findViewById(R.id.edit_include);
         EditText editOriginal = dialogView.findViewById(R.id.edit_original);
+        EditText editIngredient = dialogView.findViewById(R.id.edit_ingredient);
+        EditText editUse = dialogView.findViewById(R.id.edit_use);
+        EditText editSideEffects = dialogView.findViewById(R.id.edit_side_effects);
+        EditText editObject = dialogView.findViewById(R.id.edit_object);
         
         builder.setTitle("Thêm sản phẩm mới");
         builder.setPositiveButton("Thêm", (dialog, which) -> {
@@ -226,34 +282,36 @@ public class ManageProductsActivity extends AppCompatActivity {
                 double price = Double.parseDouble(priceStr);
                 int stock = Integer.parseInt(stockStr);
                 
-                // Create product data map
-                Map<String, Object> productData = new HashMap<>();
-                productData.put("name", name);
-                productData.put("brand", brand);
-                productData.put("category", category);
-                productData.put("price", price);
-                productData.put("stock", stock);
-                productData.put("imageUrl", editImageUrl.getText().toString().trim());
-                productData.put("description", editDescription.getText().toString().trim());
-                productData.put("dosageForm", editDosageForm.getText().toString().trim());
-                productData.put("include", editInclude.getText().toString().trim());
-                productData.put("original", editOriginal.getText().toString().trim());
-                productData.put("onDeal", false);
-                productData.put("dealPercentage", 0);
-                productData.put("isActive", true);
-                productData.put("rating", 0.0f);
+                // Create Product object
+                Product newProduct = new Product();
+                newProduct.setName(name);
+                newProduct.setBrand(brand);
+                newProduct.setCategory(category);
+                newProduct.setPrice(price);
+                newProduct.setStock(stock);
+                newProduct.setImageUrl(editImageUrl.getText().toString().trim());
+                newProduct.setDescription(editDescription.getText().toString().trim());
+                newProduct.setDosageForm(editDosageForm.getText().toString().trim());
+                newProduct.setInclude(editInclude.getText().toString().trim());
+                newProduct.setOriginal(editOriginal.getText().toString().trim());
+                newProduct.setIngredient(editIngredient.getText().toString().trim());
+                newProduct.setUse(editUse.getText().toString().trim());
+                newProduct.setSideEffects(editSideEffects.getText().toString().trim());
+                newProduct.setObject(editObject.getText().toString().trim());
+                newProduct.setOnDeal(false);
+                newProduct.setDealPercentage(0);
+                newProduct.setIsActive(true);
+                newProduct.setRating(0.0f);
+                newProduct.setSoldCount(0);
                 
-                // Add to Firebase
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                db.collection("products")
-                    .add(productData)
-                    .addOnSuccessListener(documentReference -> {
-                        Toast.makeText(this, "Đã thêm sản phẩm thành công", Toast.LENGTH_SHORT).show();
-                        loadData(); // Reload products
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Lỗi thêm sản phẩm: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
+                // Add to Firebase using ProductRepo (document ID will be sequential number)
+                ProductRepo productRepo = new ProductRepo();
+                productRepo.addProduct(newProduct);
+                
+                Toast.makeText(this, "Đã thêm sản phẩm thành công", Toast.LENGTH_SHORT).show();
+                
+                // Reload products after a short delay to allow Firebase to update
+                new android.os.Handler().postDelayed(() -> loadData(), 500);
                     
             } catch (NumberFormatException e) {
                 Toast.makeText(this, "Giá hoặc tồn kho không hợp lệ", Toast.LENGTH_SHORT).show();

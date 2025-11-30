@@ -25,7 +25,10 @@ import com.example.bt1.models.DeliveryAddress;
 import com.example.bt1.models.Notification;
 import com.example.bt1.models.Order;
 import com.example.bt1.models.Product;
+import com.example.bt1.models.Voucher;
+import com.example.bt1.adapters.VoucherSelectAdapter;
 import com.example.bt1.repositories.OrderRepo;
+import com.example.bt1.repositories.VoucherRepo;
 import com.example.bt1.utils.SharedPreferencesManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -49,13 +52,17 @@ public class PaymentActivity extends AppCompatActivity {
     private MaterialCardView cardCreditDetails;
     private CheckBox checkboxTerms;
     private Button buttonPayNow;
-    private TextView textCartSize, textSubtotal, textShipping, textTotalAmount, textBankAmount;
+    private TextView textCartSize, textSubtotal, textShipping, textTotalAmount, textBankAmount, textVoucherDiscount;
     private RecyclerView recyclerSavedAddresses;
     private TextView textNoAddresses;
     private TextInputEditText editTextAddress;
     private MaterialButton btnManageAddresses;
+    private MaterialCardView cardVoucher;
+    private TextView textVoucherCode, textVoucherValue;
 
-    private double subtotal, shipping, total;
+    private double subtotal, shipping, total, voucherDiscount = 0;
+    private Voucher selectedVoucher = null;
+    private VoucherRepo voucherRepo;
     private int cartSize;
     private List<Product> selectedProducts; // Danh sách sản phẩm đã chọn
     private List<DeliveryAddress> savedAddresses;
@@ -73,6 +80,7 @@ public class PaymentActivity extends AppCompatActivity {
         
         // Initialize OrderRepo and Firebase
         orderRepo = new OrderRepo();
+        voucherRepo = new VoucherRepo();
         db = FirebaseFirestore.getInstance();
         savedAddresses = new ArrayList<>();
 
@@ -121,6 +129,10 @@ public class PaymentActivity extends AppCompatActivity {
         textNoAddresses = findViewById(R.id.text_no_addresses);
         editTextAddress = findViewById(R.id.edit_text_address);
         btnManageAddresses = findViewById(R.id.btn_manage_addresses_payment);
+        cardVoucher = findViewById(R.id.card_voucher);
+        textVoucherCode = findViewById(R.id.text_voucher_code);
+        textVoucherValue = findViewById(R.id.text_voucher_value);
+        textVoucherDiscount = findViewById(R.id.text_voucher_discount);
         
         // Setup RecyclerView for saved addresses
         recyclerSavedAddresses.setLayoutManager(new LinearLayoutManager(this));
@@ -154,6 +166,11 @@ public class PaymentActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, DeliveryAddressesActivity.class);
                 startActivity(intent);
             });
+        }
+        
+        // Voucher card click
+        if (cardVoucher != null) {
+            cardVoucher.setOnClickListener(v -> showVoucherBottomSheet());
         }
     }
     
@@ -231,6 +248,16 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void displayPaymentInfo() {
+        // Calculate discount if voucher is selected
+        if (selectedVoucher != null) {
+            voucherDiscount = selectedVoucher.calculateTotalDiscount(subtotal, shipping);
+        } else {
+            voucherDiscount = 0;
+        }
+        
+        // Update total with discount
+        total = subtotal + shipping - voucherDiscount;
+        
         // Update cart size
         if (textCartSize != null) {
             textCartSize.setText(cartSize + " sản phẩm");
@@ -244,6 +271,17 @@ public class PaymentActivity extends AppCompatActivity {
         // Update shipping
         if (textShipping != null) {
             textShipping.setText(String.format("%,.0f₫", shipping));
+        }
+        
+        // Update voucher discount
+        if (textVoucherDiscount != null) {
+            if (voucherDiscount > 0) {
+                textVoucherDiscount.setVisibility(View.VISIBLE);
+                findViewById(R.id.layout_voucher_discount).setVisibility(View.VISIBLE);
+                textVoucherDiscount.setText(String.format("-%,.0f₫", voucherDiscount));
+            } else {
+                findViewById(R.id.layout_voucher_discount).setVisibility(View.GONE);
+            }
         }
 
         // Update total
@@ -260,6 +298,9 @@ public class PaymentActivity extends AppCompatActivity {
         if (buttonPayNow != null) {
             buttonPayNow.setText(String.format("Thanh Toán %,.0f₫", total));
         }
+        
+        // Update voucher UI
+        updateVoucherUI();
     }
 
     private boolean validatePayment() {
@@ -343,6 +384,12 @@ public class PaymentActivity extends AppCompatActivity {
 
         Order newOrder = new Order(orderId, orderDate, total, "Đang xử lý", selectedProducts);
         newOrder.setDeliveryAddress(deliveryAddress);
+        
+        // Save voucher info if applied
+        if (selectedVoucher != null) {
+            newOrder.setVoucherCode(selectedVoucher.getCode());
+            newOrder.setVoucherDiscount(voucherDiscount);
+        }
         
         // Lưu vào Firebase Firestore (nguồn chính thực)
         String userId = SharedPreferencesManager.getInstance(this).getUserId();
@@ -436,5 +483,75 @@ public class PaymentActivity extends AppCompatActivity {
         // Lưu lại giỏ hàng sau khi xóa
         String updatedJson = gson.toJson(allCartProducts);
         cartPrefs.edit().putString("cart_products", updatedJson).apply();
+    }
+    
+    private void showVoucherBottomSheet() {
+        View bottomSheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_vouchers, null);
+        com.google.android.material.bottomsheet.BottomSheetDialog bottomSheetDialog = 
+                new com.google.android.material.bottomsheet.BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(bottomSheetView);
+        
+        TextView textOrderAmount = bottomSheetView.findViewById(R.id.text_order_amount);
+        RecyclerView recyclerVouchers = bottomSheetView.findViewById(R.id.recycler_vouchers);
+        TextView textNoVouchers = bottomSheetView.findViewById(R.id.text_no_vouchers);
+        
+        textOrderAmount.setText(String.format("%,.0fđ", subtotal));
+        recyclerVouchers.setLayoutManager(new LinearLayoutManager(this));
+        
+        // Load available vouchers
+        voucherRepo.getAvailableVouchers(new VoucherRepo.VoucherCallback() {
+            @Override
+            public void onSuccess(List<Voucher> vouchers) {
+                Log.d("PaymentActivity", "Loaded vouchers: " + vouchers.size());
+                if (vouchers.isEmpty()) {
+                    textNoVouchers.setVisibility(View.VISIBLE);
+                    recyclerVouchers.setVisibility(View.GONE);
+                    Log.d("PaymentActivity", "No vouchers available - showing empty state");
+                } else {
+                    textNoVouchers.setVisibility(View.GONE);
+                    recyclerVouchers.setVisibility(View.VISIBLE);
+                    
+                    Log.d("PaymentActivity", "Creating adapter with " + vouchers.size() + " vouchers for order: " + subtotal);
+                    VoucherSelectAdapter adapter = new VoucherSelectAdapter(vouchers, subtotal, voucher -> {
+                        selectedVoucher = voucher;
+                        displayPaymentInfo();
+                        bottomSheetDialog.dismiss();
+                        Toast.makeText(PaymentActivity.this, 
+                                "Đã áp dụng voucher " + voucher.getCode(), 
+                                Toast.LENGTH_SHORT).show();
+                    });
+                    recyclerVouchers.setAdapter(adapter);
+                }
+            }
+            
+            @Override
+            public void onFailure(String error) {
+                Log.e("PaymentActivity", "Error loading vouchers: " + error);
+                textNoVouchers.setVisibility(View.VISIBLE);
+                recyclerVouchers.setVisibility(View.GONE);
+                Toast.makeText(PaymentActivity.this, "Lỗi: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+        
+        bottomSheetDialog.show();
+    }
+    
+    private void updateVoucherUI() {
+        if (cardVoucher == null) return;
+        
+        if (selectedVoucher != null) {
+            textVoucherCode.setText(selectedVoucher.getCode());
+            String valueText = String.format("Giảm %d%%", selectedVoucher.getDiscountPercent());
+            if (selectedVoucher.getMaxDiscount() > 0) {
+                valueText += String.format(" (Tối đa %,.0fđ)", selectedVoucher.getMaxDiscount());
+            }
+            if (selectedVoucher.isFreeShip()) {
+                valueText += " + Miễn phí ship";
+            }
+            textVoucherValue.setText(valueText);
+        } else {
+            textVoucherCode.setText("Chọn mã giảm giá");
+            textVoucherValue.setText("Tiết kiệm thêm cho đơn hàng");
+        }
     }
 }

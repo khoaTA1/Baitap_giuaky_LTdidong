@@ -13,6 +13,9 @@ public class Product implements Serializable {
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
     // Exclude from Firebase deserialization - set manually from document ID
     private Long id;
+    
+    // Firestore document ID (string) - lưu ID gốc từ Firestore
+    private String documentId;
 
     //@Column(nullable = false)
     private String name;
@@ -74,6 +77,9 @@ public class Product implements Serializable {
     
     // Số lượng sản phẩm trong giỏ hàng
     private int quantity = 1;
+    
+    // Số lượng đã bán (từ các đơn hàng hoàn thành)
+    private int soldCount = 0;
 
 
     // constructors
@@ -313,6 +319,14 @@ public class Product implements Serializable {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+    
+    public int getSoldCount() {
+        return soldCount;
+    }
+    
+    public void setSoldCount(int soldCount) {
+        this.soldCount = soldCount;
+    }
 
     public Long getId() {
         return id;
@@ -320,6 +334,14 @@ public class Product implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+    
+    public String getDocumentId() {
+        return documentId;
+    }
+    
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 
     public boolean getIsActive() {

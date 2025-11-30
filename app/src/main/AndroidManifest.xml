@@ -54,6 +54,9 @@
         <activity android:name=".activities.StatisticsActivity" />
         <activity android:name=".activities.DeliveryAddressesActivity" />
         <activity android:name=".activities.AddEditAddressActivity" />
+        <activity android:name=".activities.ChatActivity" />
+        <activity android:name=".activities.ManageChatActivity" />
+        <activity android:name=".activities.ManageVouchersActivity" />
         <!-- Các Activity sau sẽ thêm sau khi tạo file:
         <activity android:name=".activities.CartActivity" />
         <activity android:name=".activities.OrderActivity" />

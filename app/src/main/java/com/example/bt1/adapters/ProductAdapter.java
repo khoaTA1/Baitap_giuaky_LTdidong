@@ -18,6 +18,7 @@ import com.example.bt1.activities.HomeActivity;
 import com.example.bt1.activities.ProductDetailActivity;
 import com.example.bt1.models.Product;
 import com.example.bt1.utils.RenderImage;
+import com.example.bt1.utils.SoldCountCache;
 import com.google.android.material.button.MaterialButton;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -35,6 +36,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     private Gson gson;
     private OnProductClickListener listener;
     private RenderImage renderImage;
+    private SoldCountCache soldCountCache;
 
     public interface OnProductClickListener {
         void onProductClick(Product product);
@@ -43,6 +45,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     public ProductAdapter(Context context, List<Product> productList) {
         this.context = context;
         this.productList = productList;
+        this.soldCountCache = new SoldCountCache(context);
         
         // Lấy userId từ SharedPreferencesManager
         com.example.bt1.utils.SharedPreferencesManager prefManager = 
@@ -58,6 +61,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         this.context = context;
         this.productList = productList;
         this.listener = listener;
+        this.soldCountCache = new SoldCountCache(context);
         
         // Lấy userId từ SharedPreferencesManager
         com.example.bt1.utils.SharedPreferencesManager prefManager = 
@@ -116,6 +120,26 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         // Set rating if available
         if (product.getRating() != null && product.getRating() > 0) {
             holder.textRating.setText(String.valueOf(product.getRating()));
+        }
+        
+        // Set sold count từ cache (local) với null safety
+        if (soldCountCache != null) {
+            int soldCount = soldCountCache.getSoldCount(product.getId());
+            if (soldCount > 0) {
+                holder.textSoldCount.setText("Đã bán: " + soldCount);
+            } else {
+                holder.textSoldCount.setText("Đã bán: 0");
+            }
+        } else {
+            holder.textSoldCount.setText("Đã bán: 0");
+        }
+        
+        // ⭐ HIỂN THỊ BADGE "SẮP HẾT" NẾU TỒN KHO < 10
+        Integer stock = product.getStock();
+        if (stock != null && stock > 0 && stock < 10) {
+            holder.textLowStock.setVisibility(View.VISIBLE);
+        } else {
+            holder.textLowStock.setVisibility(View.GONE);
         }
 
         // Xử lý sự kiện click vào sản phẩm
@@ -265,7 +289,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     // ViewHolder class
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
-        TextView productName, productPrice, textOriginalPrice, textDiscount, textRating;
+        TextView productName, productPrice, textOriginalPrice, textDiscount, textRating, textSoldCount, textLowStock;
         ImageView productImage, iconFavorite;
         MaterialButton btnAddToCart;
 
@@ -276,6 +300,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             textOriginalPrice = itemView.findViewById(R.id.text_original_price);
             textDiscount = itemView.findViewById(R.id.text_discount);
             textRating = itemView.findViewById(R.id.text_rating);
+            textSoldCount = itemView.findViewById(R.id.text_sold_count);
+            textLowStock = itemView.findViewById(R.id.text_low_stock); // ⭐ LOW STOCK BADGE
             productImage = itemView.findViewById(R.id.image_product);
             iconFavorite = itemView.findViewById(R.id.icon_favorite);
             btnAddToCart = itemView.findViewById(R.id.btn_add_to_cart);

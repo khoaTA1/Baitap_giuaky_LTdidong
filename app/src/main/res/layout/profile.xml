@@ -365,6 +365,14 @@
 
             <View style="@style/Divider" />
 
+            <!-- Quản lý tin nhắn -->
+            <TextView
+                android:id="@+id/menu_manage_messages"
+                style="@style/ProfileOption"
+                android:text="💬 Quản lý tin nhắn" />
+
+            <View style="@style/Divider" />
+
             <!-- Quản lý người dùng -->
             <TextView
                 android:id="@+id/menu_manage_users"
@@ -378,6 +386,14 @@
                 android:id="@+id/menu_statistics"
                 style="@style/ProfileOption"
                 android:text="📊 Thống kê &amp; Báo cáo" />
+
+            <View style="@style/Divider" />
+
+            <!-- Quản lý mã giảm giá -->
+            <TextView
+                android:id="@+id/menu_manage_vouchers"
+                style="@style/ProfileOption"
+                android:text="🎫 Quản lý Mã giảm giá" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

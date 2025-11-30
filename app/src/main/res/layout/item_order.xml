@@ -131,6 +131,24 @@
                 android:text="Xác nhận"
                 android:visibility="gone"
                 android:backgroundTint="#4CAF50" />
+                
+            <Button
+                android:id="@+id/btn_start_shipping"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Đang giao"
+                android:visibility="gone"
+                android:backgroundTint="#2196F3" />
+                
+            <Button
+                android:id="@+id/btn_complete_order"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Hoàn thành"
+                android:visibility="gone"
+                android:backgroundTint="#FF9800" />
 
         </LinearLayout>
 

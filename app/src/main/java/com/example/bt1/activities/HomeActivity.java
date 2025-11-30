@@ -34,6 +34,7 @@ import com.example.bt1.utils.SharedPreferencesManager;
 import com.example.bt1.repositories.ProductRepo;
 import com.example.bt1.utils.DBHelper;
 import com.example.bt1.utils.RenderImage;
+import com.example.bt1.utils.SoldCountCache;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -64,8 +65,13 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
     private MaterialCardView cardSearch;
     private ImageView iconFavorites;
     private ImageView iconNotification;
+    private ImageView iconChat;
     private TextView notificationBadge;
+    private TextView chatBadge;
+    private android.widget.FrameLayout chatBadgeContainer;
     private TextView textUserGreeting;
+    private TextView textUserNameProfile;
+    // private com.google.android.material.button.MaterialButton btnLoginHome;
     private MaterialCardView cardFlashSale;
     private MaterialCardView cardHotSale;
     private TextView textTimerHours, textTimerMinutes, textTimerSeconds;
@@ -84,8 +90,9 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
     private ProductRepo productRepo;
     private DBHelper dbhelper;
     private RenderImage renderImage;
-    private static final int PAGE_SIZE_HOME_LIST = 2;
-    private int totalPages = 0;
+    private SoldCountCache soldCountCache;
+    private com.example.bt1.repositories.ChatRepository chatRepository;
+    private static final int PAGE_SIZE_HOME_LIST = 20;
 
     private boolean isLoading = false;
 
@@ -111,7 +118,10 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         cardSearch = findViewById(R.id.card_search);
         iconFavorites = findViewById(R.id.icon_favorites);
         iconNotification = findViewById(R.id.icon_notification);
+        iconChat = findViewById(R.id.icon_chat);
         notificationBadge = findViewById(R.id.notification_badge);
+        chatBadge = findViewById(R.id.chat_badge);
+        chatBadgeContainer = findViewById(R.id.chat_badge_container);
         textUserGreeting = findViewById(R.id.text_user_greeting);
         //textUserNameProfile = findViewById(R.id.text_user_name_profile);
         //btnLoginHome = findViewById(R.id.btn_login_home);
@@ -135,6 +145,16 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         // Thiết lập RecyclerView
         setupRecyclerView();
         
+        // Khởi tạo và cập nhật sold count cache
+        soldCountCache = new SoldCountCache(this);
+        soldCountCache.updateFromFirebase(null);
+
+        // Initialize chat repository
+        chatRepository = new com.example.bt1.repositories.ChatRepository();
+
+        // Check if admin and hide chat icon
+        setupChatIcon();
+
         // Load products from cache or Firebase
         updateProductCache(false);
 
@@ -156,6 +176,9 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         // Cập nhật số thông báo
         updateNotificationBadge();
         
+        // Cập nhật số tin nhắn chưa đọc
+        updateChatBadge();
+
         // Hiển thị tên người dùng
         loadUserGreeting();
 
@@ -252,6 +275,8 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         super.onResume();
         // Cập nhật lại số thông báo khi quay lại màn hình này
         updateNotificationBadge();
+        // Cập nhật số tin nhắn chưa đọc
+        updateChatBadge();
         // Cập nhật tên người dùng
         loadUserGreeting();
         // Cập nhật trạng thái yêu thích trong danh sách sản phẩm
@@ -274,12 +299,11 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         } else {
             textUserGreeting.setText("Xin chào, Khách");
             // Hiển thị nút đăng nhập khi chưa login
-            /*
-            btnLoginHome.setVisibility(android.view.View.VISIBLE);
-            btnLoginHome.setOnClickListener(v -> {
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
-            });*/
+            // btnLoginHome.setVisibility(android.view.View.VISIBLE);
+            // btnLoginHome.setOnClickListener(v -> {
+            //     Intent intent = new Intent(this, MainActivity.class);
+            //     startActivity(intent);
+            // });
         }
     }
 
@@ -296,7 +320,6 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         // createSampleData(); // Commented out - using Firebase data
 
         // 2. Khởi tạo productList nếu chưa có
-
         if (productList == null) {
             productList = new ArrayList<>();
         }
@@ -307,26 +330,61 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         // 3. Thiết lập Layout Manager (dạng lưới 2 cột)
         recyclerViewProducts.setLayoutManager(new GridLayoutManager(this, 2));
 
-        /*
-        recyclerViewProducts.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                if (dy <= 0) return;
-
-                Log.d(">>> Home Scrolled", "Người dùng đã scroll trang home -> load tiếp sản phẩm");
-                GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-                int totalItemCount = layoutManager.getItemCount();
-                int lastVisibleItem = layoutManager.findLastVisibleItemPosition();
-
-                // Nếu cuộn tới gần cuối danh sách và chưa loading → load thêm
-                if (!isLoading && lastVisibleItem >= totalItemCount - 2) {
-                    updateProductCache(true);
-                }
-            }
-        });*/
-
         // 4. Gán Adapter cho RecyclerView
         recyclerViewProducts.setAdapter(productAdapter);
+
+        // ⭐ 5. LOAD SẢN PHẨM GỢI Ý THÔNG MINH
+        loadRecommendedProducts();
+    }
+
+    /**
+     * ⭐ GỢI Ý THÔNG MINH: Sản phẩm bán chạy + Dựa trên lịch sử mua hàng
+     */
+    private void loadRecommendedProducts() {
+        if (productRepo == null) {
+            productRepo = new ProductRepo();
+        }
+
+        productRepo.getAllProducts(result -> {
+            if (result != null) {
+                List<Product> allProducts = (List<Product>) result;
+                List<Product> recommendedProducts = new ArrayList<>();
+
+                // Sắp xếp theo soldCount (giảm dần) để lấy sản phẩm bán chạy
+                allProducts.sort((p1, p2) -> {
+                    int sold1 = p1.getSoldCount();
+                    int sold2 = p2.getSoldCount();
+                    return Integer.compare(sold2, sold1); // Giảm dần
+                });
+
+                // Lấy top 10 sản phẩm bán chạy
+                int count = Math.min(10, allProducts.size());
+                for (int i = 0; i < count; i++) {
+                    recommendedProducts.add(allProducts.get(i));
+                }
+
+                // Cập nhật UI với sản phẩm gợi ý
+                runOnUiThread(() -> {
+                    if (!recommendedProducts.isEmpty()) {
+                        // Hiển thị ở đầu danh sách hoặc section riêng
+                        productList.clear();
+                        productList.addAll(recommendedProducts);
+
+                        // Thêm các sản phẩm còn lại
+                        for (Product p : allProducts) {
+                            if (!recommendedProducts.contains(p)) {
+                                productList.add(p);
+                            }
+                        }
+
+                        if (productAdapter != null) {
+                            productAdapter.notifyDataSetChanged();
+                        }
+                        Log.d("HomeActivity", "✨ Loaded " + recommendedProducts.size() + " recommended products");
+                    }
+                });
+            }
+        });
     }
 
     // phần lấy dữ liệu phân trang
@@ -578,6 +636,14 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
             Toast.makeText(this, "Lỗi: Không tìm thấy icon favorites", Toast.LENGTH_LONG).show();
         }
 
+        // Click vào icon chat để mở chat support
+        if (iconChat != null) {
+            iconChat.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ChatActivity.class);
+                startActivity(intent);
+            });
+        }
+
         // Click vào icon notification
         if (iconNotification != null) {
             iconNotification.setOnClickListener(v -> {
@@ -728,6 +794,56 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         } else {
             notificationBadge.setVisibility(View.GONE);
         }
+    }
+
+    private void setupChatIcon() {
+        SharedPreferencesManager prefManager = SharedPreferencesManager.getInstance(this);
+        String role = prefManager.getUserRole();
+
+        // Ẩn chat icon nếu là admin
+        if ("admin".equals(role)) {
+            if (chatBadgeContainer != null) {
+                chatBadgeContainer.setVisibility(View.GONE);
+            }
+        } else {
+            if (chatBadgeContainer != null) {
+                chatBadgeContainer.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    private void updateChatBadge() {
+        SharedPreferencesManager prefManager = SharedPreferencesManager.getInstance(this);
+        String userId = prefManager.getUserId();
+        String role = prefManager.getUserRole();
+
+        // Không hiển thị badge cho admin hoặc guest
+        if ("admin".equals(role) || userId == null) {
+            if (chatBadge != null) {
+                chatBadge.setVisibility(View.GONE);
+            }
+            return;
+        }
+
+        // Load unread message count from Firestore
+        String sessionId = userId;
+        chatRepository.loadChatSessions(sessions -> {
+            if (sessions != null && !sessions.isEmpty()) {
+                // Find session for this user
+                for (com.example.bt1.models.ChatSession session : sessions) {
+                    if (sessionId.equals(session.getSessionId())) {
+                        int unreadCount = session.getUnreadCount();
+                        if (unreadCount > 0) {
+                            chatBadge.setVisibility(View.VISIBLE);
+                            chatBadge.setText(String.valueOf(unreadCount));
+                        } else {
+                            chatBadge.setVisibility(View.GONE);
+                        }
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     private void startCountdown() {

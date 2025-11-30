@@ -16,7 +16,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private TextView textUsername, textUserEmail, textPhone, textAddress;
     private TextView menuUpdateInfo, menuMyOrders, menuSettings, menuHelp;
-    private TextView menuManageProducts, menuManageOrders, menuManageUsers, menuStatistics;
+    private TextView menuManageProducts, menuManageOrders, menuManageMessages, menuManageUsers, menuStatistics, menuManageVouchers;
     private ShapeableImageView imageAvatar;
     private Button buttonLogout;
     private ImageView backButton;
@@ -57,8 +57,10 @@ public class ProfileActivity extends AppCompatActivity {
         // Admin menu items
         menuManageProducts = findViewById(R.id.menu_manage_products);
         menuManageOrders = findViewById(R.id.menu_manage_orders);
+        menuManageMessages = findViewById(R.id.menu_manage_messages);
         menuManageUsers = findViewById(R.id.menu_manage_users);
         menuStatistics = findViewById(R.id.menu_statistics);
+        menuManageVouchers = findViewById(R.id.menu_manage_vouchers);
     }
 
     private void setupListeners() {
@@ -206,6 +208,12 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
         });
         
+        // Quản lý tin nhắn
+        menuManageMessages.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ManageChatActivity.class);
+            startActivity(intent);
+        });
+        
         // Quản lý người dùng
         menuManageUsers.setOnClickListener(v -> {
             Intent intent = new Intent(this, ManageUsersActivity.class);
@@ -215,6 +223,12 @@ public class ProfileActivity extends AppCompatActivity {
         // Thống kê
         menuStatistics.setOnClickListener(v -> {
             Intent intent = new Intent(this, StatisticsActivity.class);
+            startActivity(intent);
+        });
+        
+        // Quản lý mã giảm giá
+        menuManageVouchers.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ManageVouchersActivity.class);
             startActivity(intent);
         });
     }

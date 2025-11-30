@@ -61,11 +61,15 @@ public class ProductRepo {
 
                     for (QueryDocumentSnapshot doc : querySnapshot) {
                         Product product = doc.toObject(Product.class);
+                        // Lưu document ID gốc
+                        String docId = doc.getId();
+                        product.setDocumentId(docId);
                         // Set ID từ Firebase document ID
                         try {
-                            product.setId(Long.parseLong(doc.getId()));
+                            product.setId(Long.parseLong(docId));
                         } catch (NumberFormatException e) {
-                            Log.e(">>> ProductRepo", "Cannot parse document ID: " + doc.getId(), e);
+                            product.setId((long) docId.hashCode());
+                            Log.e(">>> ProductRepo", "Cannot parse document ID: " + docId + ", using hashCode", e);
                         }
                         productList.add(product);
                     }
@@ -94,16 +98,19 @@ public class ProductRepo {
                     List<Product> productList = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : querySnapshot) {
                         Product product = doc.toObject(Product.class);
+                        // Lưu document ID gốc
+                        String docId = doc.getId();
+                        product.setDocumentId(docId);
                         // Set ID từ Firebase document ID
                         try {
-                            product.setId(Long.parseLong(doc.getId()));
+                            product.setId(Long.parseLong(docId));
                         } catch (NumberFormatException e) {
-                            Log.e(">>> ProductRepo", "Cannot parse document ID: " + doc.getId(), e);
+                            product.setId((long) docId.hashCode());
+                            Log.e(">>> ProductRepo", "Cannot parse document ID: " + docId + ", using hashCode", e);
                         }
                         productList.add(product);
                     }
 
-                    // Cập nhật document cuối cùng để load tiếp lần sau
                     if (!querySnapshot.isEmpty()) {
                         lastVisibleDoc = querySnapshot.getDocuments()
                                 .get(querySnapshot.size() - 1);
@@ -155,10 +162,13 @@ public class ProductRepo {
                     if (documentSnapshot.exists()) {
                         Product product = documentSnapshot.toObject(Product.class);
                         if (product != null) {
+                            String firebaseDocId = documentSnapshot.getId();
+                            product.setDocumentId(firebaseDocId);
                             try {
-                                product.setId(Long.parseLong(documentSnapshot.getId()));
+                                product.setId(Long.parseLong(firebaseDocId));
                             } catch (NumberFormatException e) {
-                                Log.e(">>> ProductRepo", "Cannot parse document ID: " + documentSnapshot.getId(), e);
+                                product.setId((long) firebaseDocId.hashCode());
+                                Log.e(">>> ProductRepo", "Cannot parse document ID: " + firebaseDocId + ", using hashCode", e);
                             }
                             callback.returnResult(product);
                             Log.d(">>> ProductRepo", "Loaded product with ID: " + productId);
@@ -176,6 +186,91 @@ public class ProductRepo {
                     Log.e(">>> ProductRepo", "Error loading product with ID: " + productId, e);
                 });
     }
-
-
+    
+    // UPDATE SOLD COUNT
+    public void updateProductSoldCount(long productId, int soldCount) {
+        String docId = String.valueOf(productId);
+        
+        db.collection(COLLECTION_NAME)
+                .document(docId)
+                .update("soldCount", soldCount)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(">>> ProductRepo", "Updated sold count for product " + productId + ": " + soldCount);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(">>> ProductRepo", "Failed to update sold count for product " + productId, e);
+                });
+    }
+    
+    // CALCULATE AND UPDATE ALL PRODUCTS SOLD COUNT FROM COMPLETED ORDERS
+    public void calculateAndUpdateSoldCounts(OnCompleteListener<Void> listener) {
+        // Step 1: Get all completed orders
+        db.collection("orders")
+                .whereEqualTo("status", "Hoàn thành")
+                .get()
+                .addOnSuccessListener(orderSnapshots -> {
+                    // Step 2: Count sold quantity for each product
+                    java.util.HashMap<Long, Integer> soldCountMap = new java.util.HashMap<>();
+                    
+                    for (QueryDocumentSnapshot orderDoc : orderSnapshots) {
+                        try {
+                            // Get products array from order
+                            List<java.util.HashMap<String, Object>> products = 
+                                (List<java.util.HashMap<String, Object>>) orderDoc.get("products");
+                            
+                            if (products != null) {
+                                for (java.util.HashMap<String, Object> productData : products) {
+                                    try {
+                                        Long productId = null;
+                                        Object idObj = productData.get("id");
+                                        if (idObj instanceof Long) {
+                                            productId = (Long) idObj;
+                                        } else if (idObj instanceof String) {
+                                            productId = Long.parseLong((String) idObj);
+                                        } else if (idObj instanceof Integer) {
+                                            productId = ((Integer) idObj).longValue();
+                                        }
+                                        
+                                        Integer quantity = 1; // default
+                                        Object qtyObj = productData.get("quantity");
+                                        if (qtyObj instanceof Long) {
+                                            quantity = ((Long) qtyObj).intValue();
+                                        } else if (qtyObj instanceof Integer) {
+                                            quantity = (Integer) qtyObj;
+                                        } else if (qtyObj instanceof String) {
+                                            quantity = Integer.parseInt((String) qtyObj);
+                                        }
+                                        
+                                        if (productId != null) {
+                                            soldCountMap.put(productId, 
+                                                soldCountMap.getOrDefault(productId, 0) + quantity);
+                                        }
+                                    } catch (Exception e) {
+                                        Log.e(">>> ProductRepo", "Error parsing product in order", e);
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.e(">>> ProductRepo", "Error processing order: " + orderDoc.getId(), e);
+                        }
+                    }
+                    
+                    // Step 3: Update each product's sold count
+                    Log.d(">>> ProductRepo", "Updating sold counts for " + soldCountMap.size() + " products");
+                    
+                    for (java.util.Map.Entry<Long, Integer> entry : soldCountMap.entrySet()) {
+                        updateProductSoldCount(entry.getKey(), entry.getValue());
+                    }
+                    
+                    if (listener != null) {
+                        listener.onComplete(com.google.android.gms.tasks.Tasks.forResult(null));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(">>> ProductRepo", "Failed to calculate sold counts", e);
+                    if (listener != null) {
+                        listener.onComplete(com.google.android.gms.tasks.Tasks.forException(e));
+                    }
+                });
+    }
 }
