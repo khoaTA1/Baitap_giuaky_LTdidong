@@ -142,6 +142,17 @@ public class SharedPreferencesManager {
     public String getUserRole() {
         return sharedPreferences.getString(KEY_USER_ROLE, "user");
     }
+    public List<String> getRecentCates() {
+        Set<String> setString = sharedPreferences.getStringSet(KEY_USER_RECENT_CATES, null);
+
+        if (setString != null) {
+            List<String> recentCates = new ArrayList<>(setString);
+
+            return recentCates;
+        } else {
+            return null;
+        }
+    }
 
     /**
      * Lưu role của user

@@ -421,49 +421,60 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         // nếu là load tiếp tục, hoặc load lần đầu khi mới mở app
         // thì lấy từ firestore
         // kiểm tra xem có lưu trữ recent categories trong máy hoặc user hiện tại không
+        List<String> recentCates = SharedPreferencesManager.getInstance(this).getRecentCates();
 
-        productRepo.getProductsBatch(PAGE_SIZE_HOME_LIST, object -> {
-            renderImage = new RenderImage();
-            if (object == null) {
-                Log.e(">>> HomeActivity", "Lỗi: Firestore trả về null");
-                isLoading = false;
-                return;
-            }
-
-            if (((List<Product>) object).isEmpty()) {
-                Log.d(">>> HomeActivity", "Hết dữ liệu để load");
-                isLoading = false;
-                return;
-            }
-
-            AtomicInteger counter = new AtomicInteger(((List<Product>) object).size());
-
-            for (Product product : (List<Product>) object) {
-                renderImage.downloadAndSaveImage(this, product, () -> {
-                    // tải ảnh và lưu product vào SQLite
-                    dbhelper.insertProducts(Collections.singletonList(product));
-
-                    // Thêm product vào productList và cập nhật RecyclerView
-                    runOnUiThread(() -> {
-                        productList.add(product);
-                        if (productAdapter == null) {
-                            productAdapter = new ProductAdapter(this, productList, this);
-                            recyclerViewProducts.setAdapter(productAdapter);
-                        } else {
-                            productAdapter.notifyDataSetChanged();
-                        }
-                    });
-                });
-
-                // ngừng trạng thái loading sau khi tải xong tất cả các ảnh sản phẩm
-                if (counter.decrementAndGet() == 0) {
-                    isLoading = false;
-                }
-            }
-        });
+        if (recentCates == null) {
+            productRepo.getProductsBatch(PAGE_SIZE_HOME_LIST, object -> {
+                setupProductCards(object);
+            });
+        } else {
+            productRepo.getProductByRecentCate(recentCates, PAGE_SIZE_HOME_LIST, object -> {
+                setupProductCards(object);
+            });
+        }
     }
 
     // ===========================
+
+    private void setupProductCards(Object object) {
+        renderImage = new RenderImage();
+        if (object == null) {
+            Log.e(">>> HomeActivity", "Lỗi: Firestore trả về null");
+            isLoading = false;
+            return;
+        }
+
+        if (((List<Product>) object).isEmpty()) {
+            Log.d(">>> HomeActivity", "Hết dữ liệu để load");
+            isLoading = false;
+            return;
+        }
+
+        AtomicInteger counter = new AtomicInteger(((List<Product>) object).size());
+
+        for (Product product : (List<Product>) object) {
+            renderImage.downloadAndSaveImage(this, product, () -> {
+                // tải ảnh và lưu product vào SQLite
+                dbhelper.insertProducts(Collections.singletonList(product));
+
+                // Thêm product vào productList và cập nhật RecyclerView
+                runOnUiThread(() -> {
+                    productList.add(product);
+                    if (productAdapter == null) {
+                        productAdapter = new ProductAdapter(this, productList, this);
+                        recyclerViewProducts.setAdapter(productAdapter);
+                    } else {
+                        productAdapter.notifyDataSetChanged();
+                    }
+                });
+            });
+
+            // ngừng trạng thái loading sau khi tải xong tất cả các ảnh sản phẩm
+            if (counter.decrementAndGet() == 0) {
+                isLoading = false;
+            }
+        }
+    }
 
     private void setupSearchListener() {
         // Khi click vào card search, mở dialog tìm kiếm
