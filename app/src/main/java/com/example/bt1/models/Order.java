@@ -8,6 +8,9 @@ public class Order {
     private double totalAmount;
     private String status;
     private List<Product> products;  // Đổi từ 'items' thành 'products' để khớp với Firebase
+    private String deliveryAddress;  // Địa chỉ giao hàng
+    private String voucherCode;      // Mã voucher đã sử dụng
+    private double voucherDiscount;  // Số tiền giảm giá từ voucher
 
     // No-argument constructor required for Firebase Firestore deserialization
     public Order() {
@@ -68,5 +71,29 @@ public class Order {
     
     public void setProducts(List<Product> products) {
         this.products = products;
+    }
+    
+    public String getDeliveryAddress() {
+        return deliveryAddress;
+    }
+    
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
+    }
+    
+    public String getVoucherCode() {
+        return voucherCode;
+    }
+    
+    public void setVoucherCode(String voucherCode) {
+        this.voucherCode = voucherCode;
+    }
+    
+    public double getVoucherDiscount() {
+        return voucherDiscount;
+    }
+    
+    public void setVoucherDiscount(double voucherDiscount) {
+        this.voucherDiscount = voucherDiscount;
     }
 }

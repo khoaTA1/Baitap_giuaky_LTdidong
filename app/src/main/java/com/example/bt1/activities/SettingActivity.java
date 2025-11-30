@@ -2,9 +2,12 @@ package com.example.bt1.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
@@ -14,12 +17,14 @@ import androidx.core.content.ContextCompat;
 
 import com.example.bt1.R;
 import com.example.bt1.utils.Notify;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class SettingActivity extends AppCompatActivity {
     private MaterialSwitch darkThemeSwitch, notifyEnableSwitch, vibrateOnNotifySwitch;
     private ImageView backButton;
+    private TextView textVersionNumber, textBuildNumber;
     private SharedPreferences prefs;
 
     @Override
@@ -41,6 +46,12 @@ public class SettingActivity extends AppCompatActivity {
         darkThemeSwitch = findViewById(R.id.dark_theme_switch);
         notifyEnableSwitch = findViewById(R.id.notify_enable_switch);
         vibrateOnNotifySwitch = findViewById(R.id.enable_vibrate_on_notify_switch);
+        
+        textVersionNumber = findViewById(R.id.text_version_number);
+        textBuildNumber = findViewById(R.id.text_build_number);
+        
+        // Set version info from BuildConfig
+        setVersionInfo();
 
         // Đăng ký callback khi nhấn nút quay lại
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -96,6 +107,24 @@ public class SettingActivity extends AppCompatActivity {
 
             updateSwitchColor(vibrateOnNotifySwitch, isChecked);
         });
+        
+        // Setup bottom navigation
+        setupBottomNavigation();
+    }
+    
+    private void setVersionInfo() {
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            textVersionNumber.setText(packageInfo.versionName);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                textBuildNumber.setText(String.valueOf(packageInfo.getLongVersionCode()));
+            } else {
+                textBuildNumber.setText(String.valueOf(packageInfo.versionCode));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            textVersionNumber.setText("1.0");
+            textBuildNumber.setText("1");
+        }
     }
 
     // Hàm cập nhật màu của switch dựa trên trạng thái bật/tắt
@@ -108,5 +137,39 @@ public class SettingActivity extends AppCompatActivity {
         Intent intent = new android.content.Intent(this, HomeActivity.class);
         startActivity(intent);
         finish();
+    }
+    
+    private void setupBottomNavigation() {
+        // Đánh dấu mục "Setting" là đang được chọn
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_setting);
+            
+            // Gán sự kiện khi một mục được chọn
+            bottomNavigationView.setOnItemSelectedListener(item -> {
+                int itemId = item.getItemId();
+
+                if (itemId == R.id.nav_home) {
+                    Intent intent = new Intent(this, HomeActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_setting) {
+                    return true;
+                } else if (itemId == R.id.nav_cart) {
+                    Intent intent = new Intent(this, CartActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_profile) {
+                    Intent intent = new Intent(this, ProfileActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                }
+
+                return false;
+            });
+        }
     }
 }

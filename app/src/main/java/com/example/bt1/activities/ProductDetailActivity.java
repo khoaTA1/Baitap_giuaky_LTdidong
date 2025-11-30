@@ -21,11 +21,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bt1.R;
 import com.example.bt1.adapters.ProductDetailsAdapter;
+import com.example.bt1.adapters.ProductAdapter;
 import com.example.bt1.models.Comment;
 import com.example.bt1.models.Product;
 import com.example.bt1.models.ProductDetailsAbstract;
 import com.example.bt1.models.User;
 import com.example.bt1.repositories.CommentRepo;
+import com.example.bt1.repositories.ProductRepo;
 import com.example.bt1.repositories.UserRepo;
 import com.example.bt1.utils.RenderImage;
 import com.example.bt1.utils.SharedPreferencesManager;
@@ -64,6 +66,8 @@ public class ProductDetailActivity extends AppCompatActivity {
     private RenderImage renderImage;
     private UserRepo userRepo;
     private CommentRepo commentRepo;
+    
+    private ProductRepo productRepo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,6 +76,8 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        
+        productRepo = new ProductRepo();
 
         Log.d(">>>", "Vào product detail activity");
 
@@ -97,51 +103,38 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         // Lấy thông tin sản phẩm từ Intent
         Product product = (Product) getIntent().getSerializableExtra("product");
+        Long productId = null;
+        
+        if (getIntent().hasExtra("product_id")) {
+            productId = getIntent().getLongExtra("product_id", -1);
+        }
 
-        if (product != null) {
-            Log.d(">>> ProductDetailActivity", "Đã nhận sản phẩm: " + product.getName());
-            ///  render ảnh ra image view
-             renderImage = new RenderImage();
-             renderImage.renderProductImage(this, product, productImageView);
-            // Image will be rendered by ProductDetailsAdapter in RecyclerView
-
-            // Thiết lập các nút click listeners
-            setupClickListeners(product);
-            
-            // Cập nhật trạng thái yêu thích
-            updateFavoriteButton(product);
-
-            /// chuyển đổi product thành product details abstract
-            convertObj(product, new ArrayList<>());
-
-            adapter = new ProductDetailsAdapter(productViewItems, this);
-            recyclerView.setAdapter(adapter);
-
-            commentRepo = new CommentRepo();
-            
-            // Kiểm tra ID trước khi load comment
-            if (product.getId() != null) {
-                commentRepo.getCommentByPid(product.getId(), obj -> {
-                    commentsList = (List<Comment>) obj;
-                    Log.d(">>> Product Detail Activity", "Danh sách comment đã load: " + commentsList.size());
-
+        // Nếu có product_id, load từ Firebase
+        final Long finalProductId = productId;
+        if (productId != null && productId != -1) {
+            Log.d(">>> ProductDetailActivity", "Loading product with ID: " + productId);
+            productRepo.getProductById(productId, result -> {
+                if (result != null) {
+                    Product loadedProduct = (Product) result;
                     runOnUiThread(() -> {
-                        loadCommentsView(commentsList, adapter);
+                        displayProduct(loadedProduct);
                     });
-                });
-            } else {
-                Log.w(">>> Product Detail Activity", "Product ID is null, không thể load comment");
-                // Hiển thị empty comment
-                commentsList = new ArrayList<>();
-                loadCommentsView(commentsList, adapter);
-            }
+                } else {
+                    runOnUiThread(() -> {
+                        Log.e("!!!", "Không tìm thấy sản phẩm với ID: " + finalProductId);
+                        Toast.makeText(this, "Lỗi: Không thể lấy thông tin sản phẩm", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
+                }
+            });
+        } else if (product != null) {
+            // Nếu có product object trực tiếp
+            displayProduct(product);
         } else {
             Log.e("!!!", "Không có sản phẩm");
             Toast.makeText(this, "Lỗi: Không thể lấy thông tin sản phẩm", Toast.LENGTH_SHORT).show();
-            finish(); // Đóng activity nếu không có dữ liệu
+            finish();
         }
-
-        adapter = new ProductDetailsAdapter(productViewItems, this);
 
         // Đăng ký callback khi nhấn nút quay lại
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -157,32 +150,61 @@ public class ProductDetailActivity extends AppCompatActivity {
                 getOnBackPressedDispatcher().onBackPressed();
             }
         });
+    }
+    
+    private void displayProduct(Product product) {
+        Log.d(">>> ProductDetailActivity", "Đã nhận sản phẩm: " + product.getName());
+        
+        ///  render ảnh ra image view
+        renderImage = new RenderImage();
+        renderImage.renderProductImage(this, product, productImageView);
 
+        // Thiết lập các nút click listeners
+        setupClickListeners(product);
+        
+        // Cập nhật trạng thái yêu thích
+        updateFavoriteButton(product);
+
+        /// chuyển đổi product thành product details abstract
+        convertObj(product, new ArrayList<>());
+
+        adapter = new ProductDetailsAdapter(productViewItems, this);
+        recyclerView.setAdapter(adapter);
+
+        commentRepo = new CommentRepo();
         commentsList = new ArrayList<>();
-
+        
         adapter.setOnCommentSendListener((content, rating) -> {
             String userIdStr = sharedPrefsManager.getUserId();
             long userIdForComment = userIdStr != null ? Long.parseLong(userIdStr) : -1;
             Comment newCmt = new Comment(userIdForComment,
                     product.getId(),
                     rating,
-                    new Date(),
+                    new java.util.Date(),
                     content);
 
+            commentRepo.createComment(newCmt);
             commentsList.add(newCmt);
-
-            // Chèn comment view vào RecyclerView
-            productViewItems.add(new ProductDetailsAbstract.Comment(
-                    sharedPrefsManager.getUserName(),
-                    newCmt.getCreatedDate(),
-                    newCmt.getRate(),
-                    newCmt.getContent()
-            ));
-
-            adapter.notifyItemInserted(productViewItems.size() - 1);
+            loadCommentsView(commentsList, adapter);
         });
+        
+        // Kiểm tra ID trước khi load comment
+        if (product.getId() != null) {
+            commentRepo.getCommentByPid(product.getId(), obj -> {
+                commentsList = (List<Comment>) obj;
+                Log.d(">>> Product Detail Activity", "Danh sách comment đã load: " + commentsList.size());
 
-        recyclerView.setAdapter(adapter);
+                runOnUiThread(() -> {
+                    loadCommentsView(commentsList, adapter);
+                    // Load similar products after comments
+                    loadSimilarProducts(product);
+                });
+            });
+        } else {
+            Log.w(">>> Product Detail Activity", "Product ID is null, không thể load comment");
+            // Hiển thị empty comment
+            loadCommentsView(commentsList, adapter);
+        }
     }
 
     private void setupToolbar() {
@@ -412,5 +434,37 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         }
 
+    }
+    
+    private void loadSimilarProducts(Product currentProduct) {
+        if (currentProduct.getCategory() == null || currentProduct.getCategory().isEmpty()) {
+            return;
+        }
+        
+        productRepo.getAllProducts(result -> {
+            if (result != null) {
+                List<Product> allProducts = (List<Product>) result;
+                List<Product> similarProducts = new ArrayList<>();
+                
+                // Filter products with same category, exclude current product
+                for (Product product : allProducts) {
+                    if (product.getCategory() != null && 
+                        product.getCategory().equals(currentProduct.getCategory()) &&
+                        !product.getId().equals(currentProduct.getId())) {
+                        similarProducts.add(product);
+                        if (similarProducts.size() >= 5) break; // Limit to 5 products
+                    }
+                }
+                
+                runOnUiThread(() -> {
+                    if (!similarProducts.isEmpty()) {
+                        // Add similar products section to adapter
+                        productViewItems.add(new ProductDetailsAbstract.SimilarProductsSection(similarProducts, currentProduct.getId()));
+                        adapter.notifyItemInserted(productViewItems.size() - 1);
+                        Log.d(">>> ProductDetail", "Loaded " + similarProducts.size() + " similar products");
+                    }
+                });
+            }
+        });
     }
 }

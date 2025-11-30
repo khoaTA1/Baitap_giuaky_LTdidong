@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
+
+<ScrollView
+    android:id="@+id/scroll_view"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:fillViewport="true"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent">
 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/profile_layout"
@@ -356,6 +365,14 @@
 
             <View style="@style/Divider" />
 
+            <!-- Quản lý tin nhắn -->
+            <TextView
+                android:id="@+id/menu_manage_messages"
+                style="@style/ProfileOption"
+                android:text="💬 Quản lý tin nhắn" />
+
+            <View style="@style/Divider" />
+
             <!-- Quản lý người dùng -->
             <TextView
                 android:id="@+id/menu_manage_users"
@@ -369,6 +386,14 @@
                 android:id="@+id/menu_statistics"
                 style="@style/ProfileOption"
                 android:text="📊 Thống kê &amp; Báo cáo" />
+
+            <View style="@style/Divider" />
+
+            <!-- Quản lý mã giảm giá -->
+            <TextView
+                android:id="@+id/menu_manage_vouchers"
+                style="@style/ProfileOption"
+                android:text="🎫 Quản lý Mã giảm giá" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -401,3 +426,15 @@
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
+
+    <!-- THANH ĐIỀU HƯỚNG DƯỚI CÙNG -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:menu="@menu/bottom_navigation_menu" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bt1.utils.SoldCountCache;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,12 +35,16 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         Product product = (Product) getIntent().getSerializableExtra("product");
 
-        // chuyển ổi từ đối tượng product sang đối tượng trừu tượng để hiển thị ra recycler view
+        // chủyển ổi từ đối tượng product sang đối tượng trừa tượng để hiển thị ra recycler view
         productViewItems = new ArrayList<>();
 
         if (product != null) {
+            // Lấy sold count từ cache
+            SoldCountCache soldCountCache = new SoldCountCache(this);
+            int soldCount = soldCountCache.getSoldCount(product.getId());
+            
             productViewItems.add(new ProductDetailsAbstract.ProductImage(product.getImageResId()));
-            productViewItems.add(new ProductDetailsAbstract.ProductPreview(product.getName(), product.getPrice()));
+            productViewItems.add(new ProductDetailsAbstract.ProductPreview(product.getName(), product.getPrice(), soldCount));
             productViewItems.add(new ProductDetailsAbstract.SpecTitle(getString(R.string.product_spec_title)));
             productViewItems.add(new ProductDetailsAbstract.ProductSpec("Màn hình", product.getScreenSize()));
             productViewItems.add(new ProductDetailsAbstract.ProductSpec("RAM", product.getMemory()));

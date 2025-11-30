@@ -9,13 +9,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.bt1.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.imageview.ShapeableImageView;
 
 public class ProfileActivity extends AppCompatActivity {
 
     private TextView textUsername, textUserEmail, textPhone, textAddress;
     private TextView menuUpdateInfo, menuMyOrders, menuSettings, menuHelp;
-    private TextView menuManageProducts, menuManageOrders, menuManageUsers, menuStatistics;
+    private TextView menuManageProducts, menuManageOrders, menuManageMessages, menuManageUsers, menuStatistics, menuManageVouchers;
     private ShapeableImageView imageAvatar;
     private Button buttonLogout;
     private ImageView backButton;
@@ -56,8 +57,10 @@ public class ProfileActivity extends AppCompatActivity {
         // Admin menu items
         menuManageProducts = findViewById(R.id.menu_manage_products);
         menuManageOrders = findViewById(R.id.menu_manage_orders);
+        menuManageMessages = findViewById(R.id.menu_manage_messages);
         menuManageUsers = findViewById(R.id.menu_manage_users);
         menuStatistics = findViewById(R.id.menu_statistics);
+        menuManageVouchers = findViewById(R.id.menu_manage_vouchers);
     }
 
     private void setupListeners() {
@@ -75,6 +78,43 @@ public class ProfileActivity extends AppCompatActivity {
         }
         
         backButton.setOnClickListener(v -> goToHome());
+        
+        // Setup bottom navigation
+        setupBottomNavigation();
+    }
+    
+    private void setupBottomNavigation() {
+        // Đánh dấu mục "Profile" là đang được chọn
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_profile);
+            
+            // Gán sự kiện khi một mục được chọn
+            bottomNavigationView.setOnItemSelectedListener(item -> {
+                int itemId = item.getItemId();
+
+                if (itemId == R.id.nav_home) {
+                    Intent intent = new Intent(this, HomeActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_setting) {
+                    Intent intent = new Intent(this, SettingActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_cart) {
+                    Intent intent = new Intent(this, CartActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_profile) {
+                    return true;
+                }
+
+                return false;
+            });
+        }
     }
 
     private void loadProfileData() {
@@ -168,6 +208,12 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
         });
         
+        // Quản lý tin nhắn
+        menuManageMessages.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ManageChatActivity.class);
+            startActivity(intent);
+        });
+        
         // Quản lý người dùng
         menuManageUsers.setOnClickListener(v -> {
             Intent intent = new Intent(this, ManageUsersActivity.class);
@@ -177,6 +223,12 @@ public class ProfileActivity extends AppCompatActivity {
         // Thống kê
         menuStatistics.setOnClickListener(v -> {
             Intent intent = new Intent(this, StatisticsActivity.class);
+            startActivity(intent);
+        });
+        
+        // Quản lý mã giảm giá
+        menuManageVouchers.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ManageVouchersActivity.class);
             startActivity(intent);
         });
     }
