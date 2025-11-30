@@ -125,6 +125,26 @@ public class ProductRepo {
                 });
     }
 
+    // lấy danh sách sản phẩm theo 3 danh mục gần đây nhất
+    public void getProductByRecentCate(List<String> recentCates, int limit, FireStoreCallBack callback) {
+        db.collection("products")
+                .whereIn("category", recentCates).limit(limit)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<Product> products = new ArrayList<>();
+
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        products.add(doc.toObject(Product.class));
+                    }
+
+                    callback.returnResult(products);
+                    Log.d(">>> Product Repo", "Đã lấy dược danh sách sản phẩm, số lượng: " + products.size());
+                }).addOnFailureListener(e -> {
+                    Log.e("!!! Product Repo", "Lỗi: ", e);
+                    callback.returnResult(null);
+                });
+    }
+
     // UPDATE
     public void updateProduct(Product product) {
         String docId = String.valueOf(product.getId());

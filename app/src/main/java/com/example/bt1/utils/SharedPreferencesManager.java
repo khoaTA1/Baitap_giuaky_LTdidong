@@ -12,7 +12,9 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Quản lý SharedPreferences để lưu trữ dữ liệu local
@@ -27,6 +29,7 @@ public class SharedPreferencesManager {
     private static final String KEY_USER_ADDRESS = "user_address";
     private static final String KEY_USER_AVATAR = "user_avatar";
     private static final String KEY_USER_ROLE = "user_role";
+    private static final String KEY_USER_RECENT_CATES = "user_recent_categories";
 
     private static SharedPreferencesManager instance;
     private SharedPreferences sharedPreferences;
@@ -57,6 +60,9 @@ public class SharedPreferencesManager {
         editor.putString(KEY_USER_ADDRESS, user.getAddress());
         editor.putString(KEY_USER_AVATAR, user.getAvatarUrl());
         editor.putString(KEY_USER_ROLE, user.getRole());
+
+        Set<String> setString = new LinkedHashSet<>(user.getRecentCategries());
+        editor.putStringSet(KEY_USER_RECENT_CATES, setString);
         editor.apply();
     }
 

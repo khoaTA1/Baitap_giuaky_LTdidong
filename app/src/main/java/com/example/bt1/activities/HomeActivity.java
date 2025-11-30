@@ -420,6 +420,8 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
 
         // nếu là load tiếp tục, hoặc load lần đầu khi mới mở app
         // thì lấy từ firestore
+        // kiểm tra xem có lưu trữ recent categories trong máy hoặc user hiện tại không
+
         productRepo.getProductsBatch(PAGE_SIZE_HOME_LIST, object -> {
             renderImage = new RenderImage();
             if (object == null) {
