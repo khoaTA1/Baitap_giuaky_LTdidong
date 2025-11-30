@@ -10,6 +10,7 @@
 
     <!-- Phần nội dung có thể cuộn -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedscrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_navigation"
@@ -650,85 +651,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <!-- SORT BUTTON -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_sort"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="5"
-                    android:backgroundTint="@color/primary_color"
-                    android:text="Sắp xếp"
-                    android:textColor="@color/text_primary_inverted"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_marginStart="16dp"
-                    android:textAlignment="textStart"
-                    app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_sort"
-                    app:iconSize="18dp"
-                    app:iconTint="@color/text_primary_inverted"
-                    app:strokeColor="#00B894"
-                    app:strokeWidth="2dp" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/current_filter_card"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="8"
-                    android:layout_marginHorizontal="20dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardBackgroundColor="#E8F4FD"
-                    app:cardElevation="0dp"
-                    android:visibility="visible">
-
-                    <LinearLayout
-                        android:id="@+id/current_filter_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="12dp"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:id="@+id/text_current_filter"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Lọc theo: Tất cả"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="#0984E3" />
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            app:cardCornerRadius="14dp"
-                            app:cardBackgroundColor="#FF6B6B"
-                            app:cardElevation="2dp">
-
-                            <ImageView
-                                android:id="@+id/btn_clear_filter"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/ic_check_circle"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:padding="6dp"
-                                app:tint="@android:color/white"
-                                tools:ignore="ContentDescription" />
-
-                        </com.google.android.material.card.MaterialCardView>
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
-
             <!-- Product grid -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view_products"
@@ -744,63 +666,6 @@
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
-
-    <!-- EMPTY STATE -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/empty_state_card"
-        android:layout_width="280dp"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="20dp"
-        app:cardBackgroundColor="@android:color/white"
-        app:cardElevation="4dp"
-        android:visibility="gone"
-        android:layout_centerInParent="true">
-
-        <LinearLayout
-            android:id="@+id/empty_state"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="32dp">
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                app:cardCornerRadius="50dp"
-                app:cardBackgroundColor="#F0F3F7"
-                app:cardElevation="0dp">
-
-                <ImageView
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_search"
-                    app:tint="#B2BEC3"
-                    tools:ignore="ContentDescription" />
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Không tìm thấy sản phẩm"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#2D3436"
-                android:layout_marginTop="20dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Vui lòng thử với bộ lọc khác"
-                android:textSize="14sp"
-                android:textColor="#636E72"
-                android:layout_marginTop="8dp" />
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
 
     <!-- THANH ĐIỀU HƯỚNG DƯỚI CÙNG -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
