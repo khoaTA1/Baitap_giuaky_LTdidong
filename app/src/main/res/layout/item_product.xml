@@ -60,6 +60,23 @@
                 android:textSize="10sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
+            
+            <!-- ⭐ LOW STOCK BADGE -->
+            <TextView
+                android:id="@+id/text_low_stock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_margin="8dp"
+                android:background="#FF9800"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:text="⚠️ Sắp hết"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
         </RelativeLayout>
 
         <!-- Product info -->
@@ -147,10 +164,11 @@
                 android:visibility="gone"
                 tools:text="Tặng data Viettel 5G 100GB/30 ngày cho khách hàng đăng ký hàm Viettel" />
 
-            <!-- Rating -->
+            <!-- Rating and Sold Count -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
@@ -158,9 +176,9 @@
                 <RatingBar
                     android:id="@+id/rating_bar"
                     style="?android:attr/ratingBarStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_marginEnd="3dp"
                     android:isIndicator="true"
                     android:rating="4.5"
                     android:stepSize="0.5" />
@@ -169,10 +187,18 @@
                     android:id="@+id/text_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
                     android:text="4.5"
                     android:textColor="#666666"
                     android:textSize="12sp" />
+                    
+                <TextView
+                    android:id="@+id/text_sold_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Đã bán: 5"
+                    android:textColor="#666666"
+                    android:textSize="13sp" />
 
                 <Space
                     android:layout_width="0dp"
@@ -182,20 +208,19 @@
                 <!-- Favorite icon -->
                 <ImageView
                     android:id="@+id/icon_favorite"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="17dp"
+                    android:layout_height="17dp"
                     android:src="@drawable/ic_favorite_border"
                     android:tint="#999999" />
             </LinearLayout>
 
             <!-- Add to Cart Button -->
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_add_to_cart"
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:layout_marginTop="8dp"
+                android:layout_height="40dp"
                 android:text="Thêm vào giỏ"
-                android:textSize="12sp"
+                android:textSize="13sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_secondary"
                 android:background="@drawable/button_primary" />

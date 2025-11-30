@@ -35,6 +35,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_product_name" />
 
+    <TextView
+        android:id="@+id/text_sold_count_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="4dp"
+        android:text="Đã bán: 0"
+        android:textSize="12sp"
+        android:textColor="@android:color/darker_gray"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_product_price" />
+
     <!-- các nút bấm -->
     <Button
         android:id="@+id/buy_button"
@@ -45,7 +58,7 @@
         android:text="@string/buy_button_label"
         app:layout_constraintEnd_toStartOf="@id/cart_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_product_price"
+        app:layout_constraintTop_toBottomOf="@id/text_sold_count_detail"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <Button

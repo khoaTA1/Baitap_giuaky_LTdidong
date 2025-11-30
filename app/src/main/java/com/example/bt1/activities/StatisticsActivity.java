@@ -174,27 +174,36 @@ public class StatisticsActivity extends AppCompatActivity {
                                 
                                 // Count by status
                                 String status = order.getStatus();
+                                boolean isConfirmedOrCompleted = "Đã xác nhận".equals(status) || "Đang giao".equals(status) || "Hoàn thành".equals(status);
+                                
                                 if ("Đang xử lý".equals(status) || "Chờ xác nhận".equals(status)) {
                                     pendingCount++;
-                                } else if ("Đang giao".equals(status)) {
+                                } else if ("Đang giao".equals(status) || "Đã xác nhận".equals(status)) {
                                     shippingCount++;
-                                } else if ("Hoàn thành".equals(status) || "Đã giao".equals(status)) {
-                                    completedCount++;
+                                    // ⭐ ĐÃ XÁC NHẬN THÌ TÍNH DOANH THU VÀ SẢN PHẨM
                                     totalRevenue += order.getTotalAmount();
+                                    List<Product> products = order.getProducts();
+                                    if (products != null) {
+                                        for (Product product : products) {
+                                            productsSold += product.getQuantity();
+                                            long productId = product.getId();
+                                            productCountMap.put(productId, productCountMap.getOrDefault(productId, 0) + product.getQuantity());
+                                        }
+                                    }
+                                } else if ("Hoàn thành".equals(status)) {
+                                    completedCount++;
+                                    // ⭐ HOÀN THÀNH CŨNG TÍNH DOANH THU VÀ SẢN PHẨM
+                                    totalRevenue += order.getTotalAmount();
+                                    List<Product> products = order.getProducts();
+                                    if (products != null) {
+                                        for (Product product : products) {
+                                            productsSold += product.getQuantity();
+                                            long productId = product.getId();
+                                            productCountMap.put(productId, productCountMap.getOrDefault(productId, 0) + product.getQuantity());
+                                        }
+                                    }
                                 } else if ("Đã hủy".equals(status)) {
                                     cancelledCount++;
-                                    // Don't count cancelled orders in revenue or products sold
-                                    continue; // Skip counting products for cancelled orders
-                                }
-                                
-                                // Count products (only for non-cancelled orders)
-                                List<Product> products = order.getProducts();
-                                if (products != null) {
-                                    for (Product product : products) {
-                                        productsSold += product.getQuantity();
-                                        long productId = product.getId();
-                                        productCountMap.put(productId, productCountMap.getOrDefault(productId, 0) + product.getQuantity());
-                                    }
                                 }
                             }
                         }

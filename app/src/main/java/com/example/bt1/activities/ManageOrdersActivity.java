@@ -15,6 +15,7 @@ import com.example.bt1.R;
 import com.example.bt1.adapters.OrderHistoryAdapter;
 import com.example.bt1.models.Order;
 import com.example.bt1.repositories.OrderRepo;
+import com.example.bt1.repositories.ProductRepo;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -69,6 +70,16 @@ public class ManageOrdersActivity extends AppCompatActivity {
             @Override
             public void onConfirmOrder(Order order, int position) {
                 showConfirmDialog(order, position);
+            }
+
+            @Override
+            public void onStartShipping(Order order, int position) {
+                showStartShippingDialog(order, position);
+            }
+
+            @Override
+            public void onCompleteOrder(Order order, int position) {
+                showCompleteOrderDialog(order, position);
             }
         });
         recyclerOrders.setAdapter(adapter);
@@ -231,6 +242,15 @@ public class ManageOrdersActivity extends AppCompatActivity {
                     // Update local data
                     order.setStatus("Đã xác nhận");
                     adapter.notifyItemChanged(position);
+                    
+                    // ⭐ TỰ ĐỘNG GIẢM TỒN KHO KHI ADMIN XÁC NHẬN
+                    updateStockAfterOrderComplete(order);
+                    
+                    // Cập nhật sold count cache khi xác nhận đơn hàng
+                    com.example.bt1.utils.SoldCountCache soldCountCache = 
+                        new com.example.bt1.utils.SoldCountCache(ManageOrdersActivity.this);
+                    soldCountCache.updateFromFirebase(null);
+                    
                     // Reload to update statistics
                     loadData();
                 } else {
@@ -238,5 +258,91 @@ public class ManageOrdersActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+    
+    private void showStartShippingDialog(Order order, int position) {
+        new AlertDialog.Builder(this)
+            .setTitle("Bắt đầu giao hàng")
+            .setMessage("Xác nhận đơn hàng #" + order.getOrderId() + " đã được chuyển cho đơn vị vận chuyển?")
+            .setPositiveButton("Xác nhận", (dialog, which) -> {
+                startShipping(order, position);
+            })
+            .setNegativeButton("Hủy", null)
+            .show();
+    }
+    
+    private void startShipping(Order order, int position) {
+        orderRepo.updateOrderStatus(order.getOrderId(), "Đang giao", new OrderRepo.OnCompleteListener() {
+            @Override
+            public void onComplete(boolean success, String message) {
+                if (success) {
+                    Toast.makeText(ManageOrdersActivity.this, "Đơn hàng #" + order.getOrderId() + " đang được giao", Toast.LENGTH_SHORT).show();
+                    // Update local data
+                    order.setStatus("Đang giao");
+                    adapter.notifyItemChanged(position);
+                    // Reload to update statistics
+                    loadData();
+                } else {
+                    Toast.makeText(ManageOrdersActivity.this, "Lỗi: " + message, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+    
+    private void showCompleteOrderDialog(Order order, int position) {
+        new AlertDialog.Builder(this)
+            .setTitle("Hoàn thành đơn hàng")
+            .setMessage("Xác nhận đơn hàng #" + order.getOrderId() + " đã được giao thành công?")
+            .setPositiveButton("Xác nhận", (dialog, which) -> {
+                completeOrder(order, position);
+            })
+            .setNegativeButton("Hủy", null)
+            .show();
+    }
+    
+    private void completeOrder(Order order, int position) {
+        orderRepo.updateOrderStatus(order.getOrderId(), "Hoàn thành", new OrderRepo.OnCompleteListener() {
+            @Override
+            public void onComplete(boolean success, String message) {
+                if (success) {
+                    Toast.makeText(ManageOrdersActivity.this, "Đơn hàng #" + order.getOrderId() + " đã hoàn thành", Toast.LENGTH_SHORT).show();
+                    // Update local data
+                    order.setStatus("Hoàn thành");
+                    adapter.notifyItemChanged(position);
+                    // Reload to update statistics
+                    loadData();
+                } else {
+                    Toast.makeText(ManageOrdersActivity.this, "Lỗi: " + message, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+    
+    /**
+     * Giảm tồn kho tự động khi đơn hàng hoàn thành
+     */
+    private void updateStockAfterOrderComplete(Order order) {
+        List<com.example.bt1.models.Product> products = order.getProducts();
+        if (products == null || products.isEmpty()) {
+            return;
+        }
+        
+        for (com.example.bt1.models.Product product : products) {
+            final int quantity = product.getQuantity() > 0 ? product.getQuantity() : 1;
+            
+            // Lấy document ID: ưu tiên documentId, fallback về id
+            String docId = product.getDocumentId() != null ? product.getDocumentId() : String.valueOf(product.getId());
+            
+            // Giảm stock trong Firestore
+            db.collection("products")
+                .document(docId)
+                .update("stock", com.google.firebase.firestore.FieldValue.increment(-quantity))
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("ManageOrders", "Updated stock for product #" + product.getId() + ": -" + quantity);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("ManageOrders", "Failed to update stock for product #" + product.getId(), e);
+                });
+        }
     }
 }

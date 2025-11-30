@@ -33,6 +33,8 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
     
     public interface OnOrderActionListener {
         void onConfirmOrder(Order order, int position);
+        void onStartShipping(Order order, int position);
+        void onCompleteOrder(Order order, int position);
     }
 
     public OrderHistoryAdapter(Context context, List<Order> orderList) {
@@ -75,7 +77,7 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
 
         private final TextView textOrderId, textOrderDate, textOrderStatus, textOrderTotal;
         private final RecyclerView recyclerProducts;
-        private final Button btnCancelOrder, btnReorder, btnConfirmOrder;
+        private final Button btnCancelOrder, btnReorder, btnConfirmOrder, btnStartShipping, btnCompleteOrder;
 
         OrderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -87,6 +89,8 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
             btnCancelOrder = itemView.findViewById(R.id.btn_cancel_order);
             btnReorder = itemView.findViewById(R.id.btn_reorder);
             btnConfirmOrder = itemView.findViewById(R.id.btn_confirm_order);
+            btnStartShipping = itemView.findViewById(R.id.btn_start_shipping);
+            btnCompleteOrder = itemView.findViewById(R.id.btn_complete_order);
         }
 
         void bind(Order order) {
@@ -110,15 +114,30 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
             String status = order.getStatus();
             
             if (isAdminView) {
-                // Admin view: Show confirm button for pending orders
+                // Admin view: Show appropriate buttons based on status
+                btnCancelOrder.setVisibility(View.GONE);
+                btnReorder.setVisibility(View.GONE);
+                
                 if ("Chờ xác nhận".equals(status) || "Đang xử lý".equals(status)) {
+                    // Đơn mới → hiện nút Xác nhận
                     btnConfirmOrder.setVisibility(View.VISIBLE);
-                    btnCancelOrder.setVisibility(View.GONE);
-                    btnReorder.setVisibility(View.GONE);
-                } else {
+                    btnStartShipping.setVisibility(View.GONE);
+                    btnCompleteOrder.setVisibility(View.GONE);
+                } else if ("Đã xác nhận".equals(status)) {
+                    // Đã xác nhận → hiện nút Đang giao
                     btnConfirmOrder.setVisibility(View.GONE);
-                    btnCancelOrder.setVisibility(View.GONE);
-                    btnReorder.setVisibility(View.GONE);
+                    btnStartShipping.setVisibility(View.VISIBLE);
+                    btnCompleteOrder.setVisibility(View.GONE);
+                } else if ("Đang giao".equals(status)) {
+                    // Đang giao → hiện nút Hoàn thành
+                    btnConfirmOrder.setVisibility(View.GONE);
+                    btnStartShipping.setVisibility(View.GONE);
+                    btnCompleteOrder.setVisibility(View.VISIBLE);
+                } else {
+                    // Đã hoàn thành hoặc đã hủy → không hiện nút
+                    btnConfirmOrder.setVisibility(View.GONE);
+                    btnStartShipping.setVisibility(View.GONE);
+                    btnCompleteOrder.setVisibility(View.GONE);
                 }
             } else {
                 // User view: Control cancel button based on order status
@@ -143,17 +162,31 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
                 }
             }
 
-            // Handle cancel button click
+            // Handle button clicks
             btnCancelOrder.setOnClickListener(v -> showCancelDialog(order));
             
-            // Giải pháp nút Xác nhận đơn hàng (dành cho admin)
+            // Nút Xác nhận đơn hàng (admin)
             btnConfirmOrder.setOnClickListener(v -> {
                 if (actionListener != null) {
                     actionListener.onConfirmOrder(order, getAdapterPosition());
                 }
             });
             
-            // Giải pháp nút Mua lại
+            // Nút Đang giao (admin)
+            btnStartShipping.setOnClickListener(v -> {
+                if (actionListener != null) {
+                    actionListener.onStartShipping(order, getAdapterPosition());
+                }
+            });
+            
+            // Nút Hoàn thành (admin)
+            btnCompleteOrder.setOnClickListener(v -> {
+                if (actionListener != null) {
+                    actionListener.onCompleteOrder(order, getAdapterPosition());
+                }
+            });
+            
+            // Nút Mua lại
             btnReorder.setOnClickListener(v -> reorder(order));
         }
 

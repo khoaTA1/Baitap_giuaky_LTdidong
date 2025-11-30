@@ -13,9 +13,11 @@ public abstract class ProductDetailsAbstract {
     public static class ProductPreview extends ProductDetailsAbstract {
         public String productName;
         public String productPrice;
-        public ProductPreview(String productName, String productPrice) {
+        public int soldCount;
+        public ProductPreview(String productName, String productPrice, int soldCount) {
             this.productName = productName;
             this.productPrice = productPrice;
+            this.soldCount = soldCount;
         }
     }
 

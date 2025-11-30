@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_voucher"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardElevation="2dp"
+    app:cardCornerRadius="8dp">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp">
+        
+        <!-- Voucher Icon -->
+        <LinearLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/circle_background"
+            android:backgroundTint="#FFF3E0"
+            android:gravity="center">
+            
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_voucher"
+                android:tint="#FF6B35"/>
+        </LinearLayout>
+        
+        <!-- Voucher Info -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp">
+            
+            <TextView
+                android:id="@+id/text_voucher_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FREESHIP50"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"/>
+            
+            <TextView
+                android:id="@+id/text_voucher_discount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Giảm 20%"
+                android:textSize="14sp"
+                android:textColor="#FF6B35"
+                android:layout_marginTop="2dp"/>
+            
+            <TextView
+                android:id="@+id/text_voucher_condition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đơn tối thiểu 300k"
+                android:textSize="12sp"
+                android:textColor="#666"
+                android:layout_marginTop="4dp"/>
+            
+            <TextView
+                android:id="@+id/text_eligibility_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✓ Đủ điều kiện"
+                android:textSize="12sp"
+                android:textColor="#4CAF50"
+                android:layout_marginTop="4dp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+        
+        <!-- Apply Button -->
+        <Button
+            android:id="@+id/btn_apply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Áp dụng"
+            android:textSize="13sp"
+            android:layout_gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"/>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
