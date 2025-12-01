@@ -11,43 +11,41 @@ public class Voucher implements Serializable {
     private String code;            // Mã voucher (VD: "FREESHIP50", "SALE20")
     private int discountPercent;    // Phần trăm giảm giá (0-100)
     private double minOrderAmount;  // Đơn hàng tối thiểu để áp dụng
-    private double maxDiscount;     // Giảm tối đa bao nhiêu tiền
     private int totalQuantity;      // Tổng số lượng voucher
     private int usedCount;          // Số lượng đã sử dụng
-    private boolean isFreeShip;     // Miễn phí ship hay không
-    private double freeShipAmount;  // Số tiền ship được miễn phí (nếu isFreeShip = true)
-    private boolean isActive;       // Còn hiệu lực hay không
+    private boolean freeShip;       // Miễn phí ship hay không
+    private double freeShipAmount;  // Số tiền ship được miễn phí (nếu freeShip = true)
+    private boolean active;         // Còn hiệu lực hay không
     private String expiryDate;      // Ngày hết hạn (format: "dd/MM/yyyy")
     private String description;     // Mô tả voucher
     
     // Constructor mặc định (cần cho Firebase)
     public Voucher() {
         this.usedCount = 0;
-        this.isActive = true;
-        this.isFreeShip = false;
+        this.active = true;
+        this.freeShip = false;
         this.freeShipAmount = 0;
     }
     
     // Constructor đầy đủ
     public Voucher(String code, int discountPercent, double minOrderAmount, 
-                   double maxDiscount, int totalQuantity, boolean isFreeShip,
+                   int totalQuantity, boolean freeShip,
                    double freeShipAmount, String expiryDate, String description) {
         this.code = code;
         this.discountPercent = discountPercent;
         this.minOrderAmount = minOrderAmount;
-        this.maxDiscount = maxDiscount;
         this.totalQuantity = totalQuantity;
         this.usedCount = 0;
-        this.isFreeShip = isFreeShip;
+        this.freeShip = freeShip;
         this.freeShipAmount = freeShipAmount;
-        this.isActive = true;
+        this.active = true;
         this.expiryDate = expiryDate;
         this.description = description;
     }
     
     // Kiểm tra voucher có còn khả dụng không
     public boolean isAvailable() {
-        return isActive && (usedCount < totalQuantity);
+        return active && (usedCount < totalQuantity);
     }
     
     // Kiểm tra đơn hàng có đủ điều kiện áp dụng voucher không
@@ -55,29 +53,23 @@ public class Voucher implements Serializable {
         return isAvailable() && (orderAmount >= minOrderAmount);
     }
     
-    // Tính số tiền được giảm
+    // Tính số tiền được giảm (không giới hạn tối đa)
     public double calculateDiscount(double orderAmount) {
         if (!isEligible(orderAmount)) {
             return 0;
         }
         
-        double discount = orderAmount * discountPercent / 100.0;
-        
-        // Giới hạn giảm tối đa
-        if (maxDiscount > 0 && discount > maxDiscount) {
-            discount = maxDiscount;
-        }
-        
-        return discount;
+        // Giảm giá = tổng đơn hàng * phần trăm giảm (không có giới hạn tối đa)
+        return orderAmount * discountPercent / 100.0;
     }
     
     // Tính tổng tiền được giảm (bao gồm cả free ship)
     public double calculateTotalDiscount(double orderAmount, double shippingFee) {
         double discount = calculateDiscount(orderAmount);
         
-        if (isFreeShip && freeShipAmount > 0) {
-            // Giảm phí ship (tối đa bằng phí ship thực tế)
-            discount += Math.min(freeShipAmount, shippingFee);
+        // Nếu có free ship, trừ thêm phí ship
+        if (freeShip) {
+            discount += shippingFee;
         }
         
         return discount;
@@ -116,14 +108,6 @@ public class Voucher implements Serializable {
         this.minOrderAmount = minOrderAmount;
     }
     
-    public double getMaxDiscount() {
-        return maxDiscount;
-    }
-    
-    public void setMaxDiscount(double maxDiscount) {
-        this.maxDiscount = maxDiscount;
-    }
-    
     public int getTotalQuantity() {
         return totalQuantity;
     }
@@ -145,11 +129,11 @@ public class Voucher implements Serializable {
     }
     
     public boolean isFreeShip() {
-        return isFreeShip;
+        return freeShip;
     }
 
     public void setFreeShip(boolean freeShip) {
-        isFreeShip = freeShip;
+        this.freeShip = freeShip;
     }    public double getFreeShipAmount() {
         return freeShipAmount;
     }
@@ -159,11 +143,11 @@ public class Voucher implements Serializable {
     }
     
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active = active;
     }    public String getExpiryDate() {
         return expiryDate;
     }

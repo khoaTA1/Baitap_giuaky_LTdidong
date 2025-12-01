@@ -46,9 +46,6 @@ public class VoucherSelectAdapter extends RecyclerView.Adapter<VoucherSelectAdap
         // Build discount description
         StringBuilder discountDesc = new StringBuilder();
         discountDesc.append(String.format(Locale.getDefault(), "Giảm %d%%", voucher.getDiscountPercent()));
-        if (voucher.getMaxDiscount() > 0) {
-            discountDesc.append(String.format(Locale.getDefault(), " (Tối đa %,.0fđ)", voucher.getMaxDiscount()));
-        }
         if (voucher.isFreeShip()) {
             discountDesc.append(" + Miễn phí ship");
         }

@@ -110,7 +110,6 @@ public class ManageVouchersActivity extends AppCompatActivity implements Voucher
         EditText editCode = dialogView.findViewById(R.id.edit_voucher_code);
         EditText editPercent = dialogView.findViewById(R.id.edit_discount_percent);
         EditText editMinOrder = dialogView.findViewById(R.id.edit_min_order);
-        EditText editMaxDiscount = dialogView.findViewById(R.id.edit_max_discount);
         EditText editQuantity = dialogView.findViewById(R.id.edit_quantity);
         CheckBox checkFreeShip = dialogView.findViewById(R.id.checkbox_free_ship);
         TextInputLayout layoutFreeShipAmount = dialogView.findViewById(R.id.layout_free_ship_amount);
@@ -132,9 +131,6 @@ public class ManageVouchersActivity extends AppCompatActivity implements Voucher
             editCode.setEnabled(false); // Don't allow changing code
             editPercent.setText(String.valueOf(existingVoucher.getDiscountPercent()));
             editMinOrder.setText(String.valueOf((int) existingVoucher.getMinOrderAmount()));
-            if (existingVoucher.getMaxDiscount() > 0) {
-                editMaxDiscount.setText(String.valueOf((int) existingVoucher.getMaxDiscount()));
-            }
             editQuantity.setText(String.valueOf(existingVoucher.getTotalQuantity()));
             checkFreeShip.setChecked(existingVoucher.isFreeShip());
             if (existingVoucher.isFreeShip()) {
@@ -149,7 +145,7 @@ public class ManageVouchersActivity extends AppCompatActivity implements Voucher
         builder.setView(dialogView);
         builder.setPositiveButton(existingVoucher == null ? "Thêm" : "Cập nhật", (dialog, which) -> {
             saveVoucher(existingVoucher, position, editCode, editPercent, editMinOrder, 
-                    editMaxDiscount, editQuantity, checkFreeShip, editFreeShipAmount, 
+                    editQuantity, checkFreeShip, editFreeShipAmount, 
                     editExpiryDate, editDescription);
         });
         builder.setNegativeButton("Hủy", null);
@@ -165,7 +161,7 @@ public class ManageVouchersActivity extends AppCompatActivity implements Voucher
     }
     
     private void saveVoucher(Voucher existing, int position, EditText editCode, EditText editPercent,
-                            EditText editMinOrder, EditText editMaxDiscount, EditText editQuantity,
+                            EditText editMinOrder, EditText editQuantity,
                             CheckBox checkFreeShip, EditText editFreeShipAmount, 
                             EditText editExpiryDate, EditText editDescription) {
         
@@ -202,16 +198,6 @@ public class ManageVouchersActivity extends AppCompatActivity implements Voucher
                 return;
             }
             
-            double maxDiscount = 0;
-            String maxDiscountStr = editMaxDiscount.getText().toString().trim();
-            if (!maxDiscountStr.isEmpty()) {
-                maxDiscount = Double.parseDouble(maxDiscountStr);
-                if (maxDiscount < 0) {
-                    Toast.makeText(this, "Giảm tối đa không hợp lệ", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            }
-            
             double freeShipAmount = 0;
             if (checkFreeShip.isChecked()) {
                 String freeShipStr = editFreeShipAmount.getText().toString().trim();
@@ -231,14 +217,13 @@ public class ManageVouchersActivity extends AppCompatActivity implements Voucher
                 voucher = existing;
                 voucher.setDiscountPercent(percent);
                 voucher.setMinOrderAmount(minOrder);
-                voucher.setMaxDiscount(maxDiscount);
                 voucher.setTotalQuantity(quantity);
                 voucher.setFreeShip(checkFreeShip.isChecked());
                 voucher.setFreeShipAmount(freeShipAmount);
                 voucher.setExpiryDate(expiryDate);
                 voucher.setDescription(description);
             } else {
-                voucher = new Voucher(code, percent, minOrder, maxDiscount, quantity,
+                voucher = new Voucher(code, percent, minOrder, quantity,
                         checkFreeShip.isChecked(), freeShipAmount, expiryDate, description);
             }
             

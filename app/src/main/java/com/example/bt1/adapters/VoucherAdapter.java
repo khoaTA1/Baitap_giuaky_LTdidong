@@ -49,9 +49,6 @@ public class VoucherAdapter extends RecyclerView.Adapter<VoucherAdapter.VoucherV
         
         // Discount description
         String desc = String.format(Locale.getDefault(), "Giảm %d%%", voucher.getDiscountPercent());
-        if (voucher.getMaxDiscount() > 0) {
-            desc += String.format(Locale.getDefault(), " - Tối đa %,.0fđ", voucher.getMaxDiscount());
-        }
         if (voucher.isFreeShip()) {
             desc += " + FREE SHIP";
         }
