@@ -154,8 +154,8 @@ public class ProductDetailActivity extends AppCompatActivity {
     
     private void displayProduct(Product product) {
         Log.d(">>> ProductDetailActivity", "Đã nhận sản phẩm: " + product.getName());
-        
-        ///  render ảnh ra image view
+
+        // Render ảnh sản phẩm
         renderImage = new RenderImage();
         renderImage.renderProductImage(this, product, productImageView);
 
