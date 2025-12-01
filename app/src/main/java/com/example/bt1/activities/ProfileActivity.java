@@ -1,9 +1,13 @@
 package com.example.bt1.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -11,20 +15,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.bt1.R;
 import com.example.bt1.utils.global;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView textUsername, textUserEmail, textPhone, textAddress;
-    private TextView menuUpdateInfo, menuMyOrders, menuSettings, menuHelp;
-    private TextView menuManageProducts, menuManageOrders, menuManageMessages, menuManageUsers, menuStatistics, menuManageVouchers;
+    private TextView textUsername, textUserEmail;
+    private LinearLayout menuUpdateInfo, menuAddresses, menuMyOrders, menuSettings, menuHelp;
+    private LinearLayout menuManageProducts, menuManageOrders, menuManageMessages, menuManageUsers, menuStatistics, menuManageVouchers;
+    private TextView textOrdersCount, textFavoritesCount;
     private ShapeableImageView imageAvatar;
     private Button buttonLogout;
     private ImageView backButton;
-    private android.widget.LinearLayout infoContainer;
+    private MaterialCardView btnEditAvatar;
+    private com.google.android.material.card.MaterialCardView cardOrders, cardFavorites;
     private android.widget.LinearLayout guestMessageContainer;
     private android.widget.LinearLayout menuItemsContainer;
     private android.widget.LinearLayout adminMenuContainer;
+    private android.widget.LinearLayout statsContainer;
     private global global = new global();
 
     @Override
@@ -40,18 +48,25 @@ public class ProfileActivity extends AppCompatActivity {
     private void initViews() {
         textUsername = findViewById(R.id.text_username);
         textUserEmail = findViewById(R.id.text_user_email);
-        textPhone = findViewById(R.id.text_phone);
-        textAddress = findViewById(R.id.text_address);
         imageAvatar = findViewById(R.id.image_avatar);
+        btnEditAvatar = findViewById(R.id.btn_edit_avatar);
         buttonLogout = findViewById(R.id.button_logout);
         backButton = findViewById(R.id.back_button);
-        infoContainer = findViewById(R.id.info_container);
+        
+        // Stats cards
+        cardOrders = findViewById(R.id.card_orders);
+        cardFavorites = findViewById(R.id.card_favorites);
+        textOrdersCount = findViewById(R.id.text_orders_count);
+        textFavoritesCount = findViewById(R.id.text_favorites_count);
+        
+        statsContainer = findViewById(R.id.stats_container);
         guestMessageContainer = findViewById(R.id.guest_message_container);
         menuItemsContainer = findViewById(R.id.menu_items_container);
         adminMenuContainer = findViewById(R.id.admin_menu_container);
         
         // User menu items
         menuUpdateInfo = findViewById(R.id.menu_update_info);
+        menuAddresses = findViewById(R.id.menu_addresses);
         menuMyOrders = findViewById(R.id.menu_my_orders);
         menuSettings = findViewById(R.id.menu_settings);
         menuHelp = findViewById(R.id.menu_help);
@@ -59,8 +74,8 @@ public class ProfileActivity extends AppCompatActivity {
         // Admin menu items
         menuManageProducts = findViewById(R.id.menu_manage_products);
         menuManageOrders = findViewById(R.id.menu_manage_orders);
-        menuManageMessages = findViewById(R.id.menu_manage_messages);
         menuManageUsers = findViewById(R.id.menu_manage_users);
+        menuManageMessages = findViewById(R.id.menu_manage_messages);
         menuStatistics = findViewById(R.id.menu_statistics);
         menuManageVouchers = findViewById(R.id.menu_manage_vouchers);
     }
@@ -124,42 +139,101 @@ public class ProfileActivity extends AppCompatActivity {
             com.example.bt1.utils.SharedPreferencesManager.getInstance(this);
         
         if (prefManager.isLoggedIn()) {
-            // Hiển thị thông tin đăng nhập
-            infoContainer.setVisibility(android.view.View.VISIBLE);
-            guestMessageContainer.setVisibility(android.view.View.GONE);
+            // Hiển thị stats cards và menu
+            cardOrders.setVisibility(View.VISIBLE);
+            cardFavorites.setVisibility(View.VISIBLE);
+            guestMessageContainer.setVisibility(View.GONE);
             
             String fullName = prefManager.getUserName();
             String email = prefManager.getUserEmail();
-            String phone = prefManager.getUserPhone();
-            String address = prefManager.getUserAddress();
-            String role = prefManager.getUserRole(); // Lấy role từ SharedPreferences
+            String role = prefManager.getUserRole();
             
             textUsername.setText(fullName != null && !fullName.isEmpty() ? fullName : "Khách");
             textUserEmail.setText(email != null && !email.isEmpty() ? email : "Chưa có email");
-            textPhone.setText("Điện thoại: " + (phone != null && !phone.isEmpty() ? phone : "Chưa có số điện thoại"));
-            textAddress.setText("Địa chỉ: " + (address != null && !address.isEmpty() ? address : "Chưa có địa chỉ"));
+            
+            // Load stats data
+            loadStatsData();
+            
+            // Setup stats cards click listeners
+            cardOrders.setOnClickListener(v -> {
+                Intent intent = new Intent(ProfileActivity.this, OrderHistoryActivity.class);
+                startActivity(intent);
+            });
+            
+            cardFavorites.setOnClickListener(v -> {
+                Intent intent = new Intent(ProfileActivity.this, FavoriteActivity.class);
+                startActivity(intent);
+            });
             
             // Kiểm tra role và hiển thị menu tương ứng
             if ("admin".equals(role)) {
-                // Hiển thị menu admin, ẩn menu user
-                menuItemsContainer.setVisibility(android.view.View.GONE);
-                adminMenuContainer.setVisibility(android.view.View.VISIBLE);
+                // Ẩn stats cards cho admin
+                statsContainer.setVisibility(View.GONE);
+                menuItemsContainer.setVisibility(View.GONE);
+                adminMenuContainer.setVisibility(View.VISIBLE);
                 setupAdminMenuListeners();
             } else {
-                // Hiển thị menu user, ẩn menu admin
-                menuItemsContainer.setVisibility(android.view.View.VISIBLE);
-                adminMenuContainer.setVisibility(android.view.View.GONE);
+                menuItemsContainer.setVisibility(View.VISIBLE);
+                adminMenuContainer.setVisibility(View.GONE);
                 setupUserMenuListeners();
             }
         } else {
             // Hiển thị giao diện Guest
-            infoContainer.setVisibility(android.view.View.GONE);
-            guestMessageContainer.setVisibility(android.view.View.VISIBLE);
-            menuItemsContainer.setVisibility(android.view.View.GONE);
-            adminMenuContainer.setVisibility(android.view.View.GONE);
+            cardOrders.setVisibility(View.GONE);
+            cardFavorites.setVisibility(View.GONE);
+            guestMessageContainer.setVisibility(View.VISIBLE);
+            menuItemsContainer.setVisibility(View.GONE);
+            adminMenuContainer.setVisibility(View.GONE);
             
             textUsername.setText("Khách");
             textUserEmail.setText("Chưa đăng nhập");
+        }
+    }
+    
+    private void loadStatsData() {
+        com.example.bt1.utils.SharedPreferencesManager prefManager = 
+            com.example.bt1.utils.SharedPreferencesManager.getInstance(this);
+        
+        if (!prefManager.isLoggedIn()) {
+            textOrdersCount.setText("0");
+            textFavoritesCount.setText("0");
+            return;
+        }
+        
+        String userId = prefManager.getUserId();
+        
+        // Load số lượng đơn hàng từ Firestore
+        com.google.firebase.firestore.FirebaseFirestore db = 
+            com.google.firebase.firestore.FirebaseFirestore.getInstance();
+        
+        db.collection("orders")
+            .whereEqualTo("userId", userId)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                int ordersCount = queryDocumentSnapshots.size();
+                textOrdersCount.setText(String.valueOf(ordersCount));
+            })
+            .addOnFailureListener(e -> {
+                textOrdersCount.setText("0");
+            });
+        
+        // Load số lượng yêu thích từ SharedPreferences
+        try {
+            String favKey = userId != null ? "favorites_" + userId : "favorites_guest";
+            SharedPreferences favPrefs = getSharedPreferences(favKey, MODE_PRIVATE);
+            String json = favPrefs.getString("favorite_products", "[]");
+            
+            com.google.gson.Gson gson = new com.google.gson.Gson();
+            java.lang.reflect.Type type = new com.google.gson.reflect.TypeToken<java.util.List<Long>>(){}.getType();
+            java.util.List<Long> favoriteIds = gson.fromJson(json, type);
+            
+            if (favoriteIds != null) {
+                textFavoritesCount.setText(String.valueOf(favoriteIds.size()));
+            } else {
+                textFavoritesCount.setText("0");
+            }
+        } catch (Exception e) {
+            textFavoritesCount.setText("0");
         }
     }
     
@@ -167,7 +241,7 @@ public class ProfileActivity extends AppCompatActivity {
         com.example.bt1.utils.SharedPreferencesManager prefManager = 
             com.example.bt1.utils.SharedPreferencesManager.getInstance(this);
         
-        // Setup menu item click listeners
+        // Cập nhật thông tin
         menuUpdateInfo.setOnClickListener(v -> {
             if (prefManager.isLoggedIn()) {
                 Intent intent = new Intent(ProfileActivity.this, UpdateInfoActivity.class);
@@ -177,6 +251,17 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
         
+        // Địa chỉ
+        menuAddresses.setOnClickListener(v -> {
+            if (prefManager.isLoggedIn()) {
+                Intent intent = new Intent(ProfileActivity.this, DeliveryAddressesActivity.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(ProfileActivity.this, "Vui lòng đăng nhập để xem địa chỉ", Toast.LENGTH_SHORT).show();
+            }
+        });
+        
+        // Đơn hàng
         menuMyOrders.setOnClickListener(v -> {
             if (prefManager.isLoggedIn()) {
                 Intent orderIntent = new Intent(ProfileActivity.this, OrderHistoryActivity.class);
@@ -186,11 +271,13 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
         
+        // Cài đặt
         menuSettings.setOnClickListener(v -> {
             Intent settingRed = new Intent(ProfileActivity.this, SettingActivity.class);
             startActivity(settingRed);
         });
         
+        // Trợ giúp
         menuHelp.setOnClickListener(v -> {
             Intent helpIntent = new Intent(ProfileActivity.this, HelpSupportActivity.class);
             startActivity(helpIntent);
@@ -198,6 +285,10 @@ public class ProfileActivity extends AppCompatActivity {
     }
     
     private void setupAdminMenuListeners() {
+        // Ẩn Cài đặt và Trợ giúp cho admin
+        menuSettings.setVisibility(View.GONE);
+        menuHelp.setVisibility(View.GONE);
+        
         // Quản lý sản phẩm
         menuManageProducts.setOnClickListener(v -> {
             Intent intent = new Intent(this, ManageProductsActivity.class);
@@ -210,15 +301,15 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
         });
         
-        // Quản lý tin nhắn
-        menuManageMessages.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ManageChatActivity.class);
-            startActivity(intent);
-        });
-        
         // Quản lý người dùng
         menuManageUsers.setOnClickListener(v -> {
             Intent intent = new Intent(this, ManageUsersActivity.class);
+            startActivity(intent);
+        });
+        
+        // Quản lý tin nhắn
+        menuManageMessages.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ManageChatActivity.class);
             startActivity(intent);
         });
         

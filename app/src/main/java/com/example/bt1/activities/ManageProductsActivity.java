@@ -214,7 +214,7 @@ public class ManageProductsActivity extends AppCompatActivity {
                 try {
                     int discount = Integer.parseInt(editDiscount.getText().toString());
                     if (discount >= 0 && discount <= 100) {
-                        updates.put("dealPercentage", discount);
+                        updates.put("discountPercent", discount);
                     } else {
                         Toast.makeText(this, "Giảm giá phải từ 0-100%", Toast.LENGTH_SHORT).show();
                         return;
@@ -224,12 +224,19 @@ public class ManageProductsActivity extends AppCompatActivity {
                     return;
                 }
             } else {
-                updates.put("dealPercentage", 0);
+                updates.put("discountPercent", 0);
+            }
+            
+            // ⭐ Sửa: Dùng documentId thay vì getId()
+            String docId = product.getDocumentId();
+            if (docId == null || docId.isEmpty()) {
+                // Fallback: nếu không có documentId, dùng id
+                docId = String.valueOf(product.getId());
             }
             
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             db.collection("products")
-                .document(String.valueOf(product.getId()))
+                .document(docId)
                 .update(updates)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Đã cập nhật sản phẩm", Toast.LENGTH_SHORT).show();
@@ -299,7 +306,7 @@ public class ManageProductsActivity extends AppCompatActivity {
                 newProduct.setSideEffects(editSideEffects.getText().toString().trim());
                 newProduct.setObject(editObject.getText().toString().trim());
                 newProduct.setOnDeal(false);
-                newProduct.setDealPercentage(0);
+                newProduct.setDiscountPercent(0); // ⭐ Sửa: setDealPercentage -> setDiscountPercent
                 newProduct.setIsActive(true);
                 newProduct.setRating(0.0f);
                 newProduct.setSoldCount(0);

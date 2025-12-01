@@ -248,15 +248,22 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void displayPaymentInfo() {
-        // Calculate discount if voucher is selected
+        // Calculate discount and shipping based on voucher
+        double displayShipping = shipping;
         if (selectedVoucher != null) {
-            voucherDiscount = selectedVoucher.calculateTotalDiscount(subtotal, shipping);
+            // Tính giảm giá từ subtotal (không bao gồm ship)
+            voucherDiscount = selectedVoucher.calculateDiscount(subtotal);
+            
+            // Nếu có free ship, shipping hiển thị = 0
+            if (selectedVoucher.isFreeShip()) {
+                displayShipping = 0;
+            }
         } else {
             voucherDiscount = 0;
         }
         
-        // Update total with discount
-        total = subtotal + shipping - voucherDiscount;
+        // Update total: subtotal + shipping hiển thị - voucher discount
+        total = subtotal + displayShipping - voucherDiscount;
         
         // Update cart size
         if (textCartSize != null) {
@@ -268,12 +275,17 @@ public class PaymentActivity extends AppCompatActivity {
             textSubtotal.setText(String.format("%,.0f₫", subtotal));
         }
 
-        // Update shipping
+        // Update shipping (hiển thị 0đ màu đỏ nếu free ship)
         if (textShipping != null) {
-            textShipping.setText(String.format("%,.0f₫", shipping));
+            textShipping.setText(String.format("%,.0f₫", displayShipping));
+            if (selectedVoucher != null && selectedVoucher.isFreeShip() && displayShipping == 0) {
+                textShipping.setTextColor(0xFFFF0000); // Màu đỏ
+            } else {
+                textShipping.setTextColor(0xFF000000); // Màu đen
+            }
         }
         
-        // Update voucher discount
+        // Update voucher discount (hiển thị số tiền giảm thực tế)
         if (textVoucherDiscount != null) {
             if (voucherDiscount > 0) {
                 textVoucherDiscount.setVisibility(View.VISIBLE);
@@ -388,6 +400,7 @@ public class PaymentActivity extends AppCompatActivity {
         // Save voucher info if applied
         if (selectedVoucher != null) {
             newOrder.setVoucherCode(selectedVoucher.getCode());
+            // voucherDiscount đã được tính đúng trong displayPaymentInfo (chỉ từ subtotal)
             newOrder.setVoucherDiscount(voucherDiscount);
         }
         
@@ -542,9 +555,6 @@ public class PaymentActivity extends AppCompatActivity {
         if (selectedVoucher != null) {
             textVoucherCode.setText(selectedVoucher.getCode());
             String valueText = String.format("Giảm %d%%", selectedVoucher.getDiscountPercent());
-            if (selectedVoucher.getMaxDiscount() > 0) {
-                valueText += String.format(" (Tối đa %,.0fđ)", selectedVoucher.getMaxDiscount());
-            }
             if (selectedVoucher.isFreeShip()) {
                 valueText += " + Miễn phí ship";
             }

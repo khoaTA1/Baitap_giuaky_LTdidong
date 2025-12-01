@@ -148,19 +148,6 @@
                         android:maxLines="3" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Manage Delivery Addresses Button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_manage_addresses"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Quản lý địa chỉ giao hàng"
-                    android:textSize="14sp"
-                    app:icon="@drawable/ic_location"
-                    app:iconGravity="textStart"
-                    app:cornerRadius="12dp" />
-
                 <!-- Divider -->
                 <View
                     android:layout_width="match_parent"
