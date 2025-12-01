@@ -2,6 +2,9 @@ package com.example.bt1.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Model đại diện cho người dùng trong hệ thống
  */
@@ -36,6 +39,9 @@ public class User {
     @SerializedName("is_active")
     private Boolean isActive = true; // Trạng thái tài khoản: true = đang hoạt động, false = đã khóa
 
+    @SerializedName("recentCates")
+    private List<String> recentCategries = new ArrayList<>();
+
     // Constructors
     public User() {
         this.role = "user"; // Mặc định là user
@@ -55,6 +61,14 @@ public class User {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public List<String> getRecentCategries() {
+        return recentCategries;
+    }
+
+    public void setRecentCategries(List<String> recentCategries) {
+        this.recentCategries = recentCategries;
     }
 
     public String getEmail() {

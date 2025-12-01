@@ -2,6 +2,7 @@ package com.example.bt1.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.bt1.models.User;
 import com.example.bt1.models.Product;
@@ -12,7 +13,9 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Quản lý SharedPreferences để lưu trữ dữ liệu local
@@ -27,6 +30,7 @@ public class SharedPreferencesManager {
     private static final String KEY_USER_ADDRESS = "user_address";
     private static final String KEY_USER_AVATAR = "user_avatar";
     private static final String KEY_USER_ROLE = "user_role";
+    private static final String KEY_USER_RECENT_CATES = "user_recent_categories";
 
     private static SharedPreferencesManager instance;
     private SharedPreferences sharedPreferences;
@@ -57,6 +61,9 @@ public class SharedPreferencesManager {
         editor.putString(KEY_USER_ADDRESS, user.getAddress());
         editor.putString(KEY_USER_AVATAR, user.getAvatarUrl());
         editor.putString(KEY_USER_ROLE, user.getRole());
+
+        Set<String> setString = new LinkedHashSet<>(user.getRecentCategries());
+        editor.putStringSet(KEY_USER_RECENT_CATES, setString);
         editor.apply();
     }
 
@@ -135,6 +142,82 @@ public class SharedPreferencesManager {
      */
     public String getUserRole() {
         return sharedPreferences.getString(KEY_USER_ROLE, "user");
+    }
+
+    // lưu và lấy dánh sách danh mục gần đây của user
+    public List<String> getRecentCates() {
+        Set<String> setString = sharedPreferences.getStringSet(KEY_USER_RECENT_CATES, null);
+
+        if (setString != null) {
+            List<String> recentCates = new ArrayList<>(setString);
+
+            return recentCates;
+        } else {
+            return null;
+        }
+    }
+
+    public void insertRecentCate(Product product) {
+        String newCate = product.getCategory();
+
+        // Lấy danh sách hiện tại
+        Set<String> stored = sharedPreferences.getStringSet(KEY_USER_RECENT_CATES, null);
+
+        // Chuyển sang list để xử lý
+        List<String> recentCategories = (stored == null)
+                ? new ArrayList<>()
+                : new ArrayList<>(stored);
+
+        // Giới hạn tối đa 3 phần tử
+        int maxSize = 3;
+
+        // Nếu phần tử đã tồn tại → xoá để tránh trùng
+        recentCategories.remove(newCate);
+
+        // Dịch các phần tử xuống
+        // và thêm phần tử mới vào đầu
+        recentCategories.add(0, newCate);
+
+        // Cắt danh sách về tối đa 3 phần tử
+        if (recentCategories.size() > maxSize) {
+            recentCategories = recentCategories.subList(0, maxSize);
+        }
+
+        // Lưu lại bằng Set (LinkedHashSet để giữ thứ tự)
+        Set<String> setString = new LinkedHashSet<>(recentCategories);
+        editor.putStringSet(KEY_USER_RECENT_CATES, setString).apply();
+
+        Log.d(">>> SharedPrefManag", "Danh sách cate gần đây: " + recentCategories.size());
+
+        /*
+        List<String> recentCategories = new ArrayList<>(sharedPreferences.getStringSet(KEY_USER_RECENT_CATES, null));
+
+        try {
+            // nếu hiện tại chưa có cate gần đây nào, thì tạo mới
+            if (recentCategories == null || recentCategories.isEmpty()) {
+                Set<String> setString = new LinkedHashSet<>();
+                setString.add(product.getCategory());
+                editor.putStringSet(KEY_USER_RECENT_CATES, setString).apply();
+                Log.d(">>> SharedPrefManag", "đã tạo mới danh sách danh mục gần đây");
+
+                return;
+            }
+
+            // nếu đã tồn tại trong local thì đẩy các cate cũ xuống
+            // và thêm cate mới nhất vào đầu
+            for (int i = Math.min(recentCategories.size(), 2); i > 0; i--) {
+                recentCategories.set(i, recentCategories.get(i - 1));
+            }
+
+            recentCategories.set(0, product.getCategory());
+
+            Set<String> setString = new LinkedHashSet<>(recentCategories);
+            editor.putStringSet(KEY_USER_RECENT_CATES, setString).apply();
+
+            Log.d(">>> SharedPrefManag", "insert danh mục gần đây, danh sách hiện tại: " + setString.size());
+        } catch (Exception e) {
+            Log.e("!!! SharedPrefManag", "Lỗi:", e);
+        }*/
     }
 
     /**

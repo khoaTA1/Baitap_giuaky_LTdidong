@@ -10,6 +10,7 @@
 
     <!-- Phần nội dung có thể cuộn -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedscrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_navigation"

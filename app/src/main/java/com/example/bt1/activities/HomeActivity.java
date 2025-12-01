@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -14,9 +15,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,11 +31,13 @@ import com.example.bt1.adapters.BannerAdapter;
 import com.example.bt1.adapters.ProductAdapter;
 import com.example.bt1.adapters.SearchSuggestionAdapter;
 import com.example.bt1.models.Product;
+import com.example.bt1.repositories.UserRepo;
 import com.example.bt1.utils.SharedPreferencesManager;
 import com.example.bt1.repositories.ProductRepo;
 import com.example.bt1.utils.DBHelper;
 import com.example.bt1.utils.RenderImage;
 import com.example.bt1.utils.SoldCountCache;
+import com.example.bt1.utils.global;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -46,9 +52,14 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HomeActivity extends AppCompatActivity implements ProductAdapter.OnProductClickListener, SearchSuggestionAdapter.OnSuggestionClickListener {
 
@@ -71,6 +82,10 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
     private MaterialCardView cardFlashSale;
     private MaterialCardView cardHotSale;
     private TextView textTimerHours, textTimerMinutes, textTimerSeconds;
+    private MaterialCardView categoryVitamin, categoryDigestion, categoryHormone;
+    private MaterialCardView categoryTreatment, categoryOther1, categoryOther2;
+    private NestedScrollView nestedScrollView;
+
     private CountDownTimer countDownTimer;
     private ViewPager2 bannerViewPager;
     private android.widget.LinearLayout bannerIndicator;
@@ -80,11 +95,15 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
     
     // Repository and Database
     private ProductRepo productRepo;
+    private UserRepo userRepo;
     private DBHelper dbhelper;
     private RenderImage renderImage;
     private SoldCountCache soldCountCache;
     private com.example.bt1.repositories.ChatRepository chatRepository;
-    private static final int PAGE_SIZE = 20;
+    private static final int PAGE_SIZE_HOME_LIST = 2;
+
+    private boolean isLoading = false;
+    private global global = new global();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +141,15 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         textTimerSeconds = findViewById(R.id.text_timer_seconds);
         bannerViewPager = findViewById(R.id.banner_view_pager);
         bannerIndicator = findViewById(R.id.banner_indicator);
+        nestedScrollView = findViewById(R.id.nestedscrollview);
+
+        // Category cards - Danh mục thực phẩm chức năng
+        categoryVitamin = findViewById(R.id.brand_iphone);
+        categoryDigestion = findViewById(R.id.brand_samsung);
+        categoryHormone = findViewById(R.id.brand_xiaomi);
+        categoryTreatment = findViewById(R.id.brand_oppo);
+        categoryOther1 = findViewById(R.id.brand_vivo);
+        categoryOther2 = findViewById(R.id.brand_realme);
 
         // Thiết lập RecyclerView
         setupRecyclerView();
@@ -129,13 +157,13 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         // Khởi tạo và cập nhật sold count cache
         soldCountCache = new SoldCountCache(this);
         soldCountCache.updateFromFirebase(null);
-        
+
         // Initialize chat repository
         chatRepository = new com.example.bt1.repositories.ChatRepository();
-        
+
         // Check if admin and hide chat icon
         setupChatIcon();
-        
+
         // Load products from cache or Firebase
         updateProductCache(false);
 
@@ -159,12 +187,35 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         
         // Cập nhật số tin nhắn chưa đọc
         updateChatBadge();
-        
+
         // Hiển thị tên người dùng
         loadUserGreeting();
 
         // Bắt đầu đếm ngược
         startCountdown();
+
+        setupCategoryClickListeners();
+
+        // xử lí load thêm sản phẩm khi người dùng scroll xuống
+        nestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                // chiều cao của toàn bộ nội dung bên trong
+                View contentView = v.getChildAt(0);
+                int contentHeight = contentView.getHeight();
+
+                // chiều cao của NestedScrollView
+                int scrollViewHeight = v.getHeight();
+
+                // scrollY: vị trí scroll hiện tại
+                if (scrollY + scrollViewHeight >= contentHeight) {
+                    Log.d(">>> Home Activity", "Người dùng cuộn xuống");
+                    // user đã cuộn đến cuối
+                    updateProductCache(true);
+                }
+            }
+        });
+
     }
 
     private void setupBannerSlideshow() {
@@ -290,51 +341,52 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
 
         // 4. Gán Adapter cho RecyclerView
         recyclerViewProducts.setAdapter(productAdapter);
-        
+
         // ⭐ 5. LOAD SẢN PHẨM GỢI Ý THÔNG MINH
-        loadRecommendedProducts();
+        //loadRecommendedProducts();
     }
-    
+
     /**
      * ⭐ GỢI Ý THÔNG MINH: Sản phẩm bán chạy + Dựa trên lịch sử mua hàng
      */
+    /*
     private void loadRecommendedProducts() {
         if (productRepo == null) {
             productRepo = new ProductRepo();
         }
-        
+
         productRepo.getAllProducts(result -> {
             if (result != null) {
                 List<Product> allProducts = (List<Product>) result;
                 List<Product> recommendedProducts = new ArrayList<>();
-                
+
                 // Sắp xếp theo soldCount (giảm dần) để lấy sản phẩm bán chạy
                 allProducts.sort((p1, p2) -> {
                     int sold1 = p1.getSoldCount();
                     int sold2 = p2.getSoldCount();
                     return Integer.compare(sold2, sold1); // Giảm dần
                 });
-                
+
                 // Lấy top 10 sản phẩm bán chạy
                 int count = Math.min(10, allProducts.size());
                 for (int i = 0; i < count; i++) {
                     recommendedProducts.add(allProducts.get(i));
                 }
-                
+
                 // Cập nhật UI với sản phẩm gợi ý
                 runOnUiThread(() -> {
                     if (!recommendedProducts.isEmpty()) {
                         // Hiển thị ở đầu danh sách hoặc section riêng
                         productList.clear();
                         productList.addAll(recommendedProducts);
-                        
+
                         // Thêm các sản phẩm còn lại
                         for (Product p : allProducts) {
                             if (!recommendedProducts.contains(p)) {
                                 productList.add(p);
                             }
                         }
-                        
+
                         if (productAdapter != null) {
                             productAdapter.notifyDataSetChanged();
                         }
@@ -344,19 +396,13 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
             }
         });
     }
+   */
 
-    // private void createSampleData() {
-    //     productList = new ArrayList<>();
-    //     // Sử dụng dữ liệu thực phẩm chức năng từ global.java
-    //     global globalData = new global();
-    //     productList = globalData.getDefaultData();
-    // }
-    
-    // private void loadProductList() {
-
-    // }
-
+    // phần lấy dữ liệu phân trang
     private void updateProductCache(boolean loadNextPage) {
+        if (isLoading) return;
+        isLoading = true;
+
         if (productRepo == null) {
             productRepo = new ProductRepo();
         }
@@ -385,28 +431,85 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
 
         // nếu là load tiếp tục, hoặc load lần đầu khi mới mở app
         // thì lấy từ firestore
-        productRepo.getProductsBatch(PAGE_SIZE, object -> {
-            renderImage = new RenderImage();
-            if (object != null) {
-                for (Product product : (List<Product>) object) {
-                    renderImage.downloadAndSaveImage(this, product, () -> {
-                        // tải ảnh và lưu product vào SQLite
-                        dbhelper.insertProducts(Collections.singletonList(product));
+        // kiểm tra xem có lưu trữ recent categories trong máy hoặc user hiện tại không
+        List<String> recentCates_ifLogged = SharedPreferencesManager.getInstance(this).getRecentCates();
 
-                        // Thêm product vào productList và cập nhật RecyclerView
-                        runOnUiThread(() -> {
-                            productList.add(product);
-                            if (productAdapter == null) {
-                                productAdapter = new ProductAdapter(this, productList, this);
-                                recyclerViewProducts.setAdapter(productAdapter);
-                            } else {
-                                productAdapter.notifyDataSetChanged();
-                            }
-                        });
-                    });
-                }
+        SharedPreferences sharedPreferences = this.getSharedPreferences("guest", MODE_PRIVATE);
+        List<String> recentCates_ifNotLogged =
+                sharedPreferences.getStringSet("guest_recent_categories", null) != null ?
+                new ArrayList<>(sharedPreferences.getStringSet("guest_recent_categories", null)) : null;
+
+
+        if (recentCates_ifLogged == null && recentCates_ifNotLogged == null) {
+            Log.d(">>> DEBUG", "không có bất kỳ danh sách recent categories nào");
+
+            if (global.isFirstLoad) productRepo.clearLastDocumentTracked();
+
+            productRepo.getProductsBatch(PAGE_SIZE_HOME_LIST, object -> {
+                setupProductCards(object);
+            });
+
+            global.isFirstLoad = false;
+        } else {
+            Log.d(">>> DEBUG", "lấy danh sách recent cate từ: " + ((recentCates_ifLogged != null && !recentCates_ifLogged.isEmpty()) ? "user" : "guest"));
+
+            if (global.isFirstLoad) productRepo.clearLastDocumentTracked();
+
+            // lấy 1 trong 2 nguồn dữ liệu của danh sách cate gần đây
+            // ưu tiên lấy từ user đã đăng nhập
+            List<String> recentCates = (recentCates_ifLogged != null && !recentCates_ifLogged.isEmpty()) ? recentCates_ifLogged : recentCates_ifNotLogged;
+            Log.d(">>> DEBUG", "danh sách recent cate từ user có số lượng: " + (recentCates_ifLogged != null ? recentCates_ifLogged.size() : 0));
+            Log.d(">>> DEBUG", "danh sách recent cate từ local có số lượng: " + (recentCates_ifNotLogged != null ? recentCates_ifNotLogged.size() : 0));
+            Log.d(">>> DEBUG", "danh sách recent cate có số lượng: " + recentCates.size());
+
+            productRepo.getProductByRecentCate(recentCates, PAGE_SIZE_HOME_LIST, object -> {
+                setupProductCards(object);
+            });
+
+            global.isFirstLoad = false;
+        }
+    }
+
+    // ===========================
+
+    private void setupProductCards(Object object) {
+        renderImage = new RenderImage();
+        if (object == null) {
+            Log.e(">>> HomeActivity", "Lỗi: Firestore trả về null");
+            isLoading = false;
+            return;
+        }
+
+        if (((List<Product>) object).isEmpty()) {
+            Log.d(">>> HomeActivity", "Hết dữ liệu để load");
+            isLoading = false;
+            return;
+        }
+
+        AtomicInteger counter = new AtomicInteger(((List<Product>) object).size());
+
+        for (Product product : (List<Product>) object) {
+            renderImage.downloadAndSaveImage(this, product, () -> {
+                // tải ảnh và lưu product vào SQLite
+                dbhelper.insertProducts(Collections.singletonList(product));
+
+                // Thêm product vào productList và cập nhật RecyclerView
+                runOnUiThread(() -> {
+                    productList.add(product);
+                    if (productAdapter == null) {
+                        productAdapter = new ProductAdapter(this, productList, this);
+                        recyclerViewProducts.setAdapter(productAdapter);
+                    } else {
+                        productAdapter.notifyDataSetChanged();
+                    }
+                });
+            });
+
+            // ngừng trạng thái loading sau khi tải xong tất cả các ảnh sản phẩm
+            if (counter.decrementAndGet() == 0) {
+                isLoading = false;
             }
-        });
+        }
     }
 
     private void setupSearchListener() {
@@ -443,8 +546,12 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
             suggestions, 
             product -> {
                 // When suggestion clicked, go to product detail
+                // khi sản phẩm được chọn, lưu lại danh mục gần đây
                 Intent intent = new Intent(this, ProductDetailActivity.class);
                 intent.putExtra("product", product);
+
+                // lưu lại dữ liệu nười dùng
+                updateRecentCategories(product);
                 startActivity(intent);
                 dialog.dismiss();
             }
@@ -562,6 +669,58 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         });
     }
 
+    private void updateRecentCategories(Product product) {
+
+        Log.d(">>> Home Activity", "cập nhật danh sách recent categories");
+        // Nếu user đã đăng nhập
+        SharedPreferencesManager sharedPrefManager = SharedPreferencesManager.getInstance(this);
+        if (sharedPrefManager.isLoggedIn()) {
+            // cập nhật recent cate trong local
+            sharedPrefManager.insertRecentCate(product);
+
+            // cập nhật lên firestore
+            if (userRepo == null) userRepo = new UserRepo();
+            userRepo.updateUserRecentCategories(Long.valueOf(sharedPrefManager.getUserId()), product.getCategory(), cb -> {
+                if (cb.equals("ok")) {
+                    Log.d(">>> Home Activity", "Đã update recent cate lên firestore");
+                } else {
+                    Log.e("!!! Home Activity", "update recent cate KHÔNG thành công");
+                }
+            });
+
+            // nếu người dùng chưa đăng nhập thì lưu và lấy tạm trong local
+            // nhưng vẫn ưu tiên lấy dữ liệu của tài khoản người dùng trước (nếu có đăng nhập)
+        } else {
+            SharedPreferences sharedPreferences = this.getSharedPreferences("guest", MODE_PRIVATE);
+
+            Set<String> setString = sharedPreferences.getStringSet("guest_recent_categories", null);
+
+            if (setString == null) {
+                setString = new LinkedHashSet<>();
+                setString.add(product.getCategory());
+
+                sharedPreferences.edit().putStringSet("guest_recent_categories", setString).apply();
+                Log.d(">>> Home Activity", "đã tạo mới danh sách danh mục gần đây");
+
+                return;
+            }
+
+            // nếu đã tồn tại trong local thì đẩy các cate cũ xuống
+            // và thêm cate mới nhất vào đầu
+            List<String> recentCategories = new ArrayList<>(setString);
+
+            for (int i = Math.min(recentCategories.size(), 2); i > 0; i--) {
+                recentCategories.set(i, recentCategories.get(i - 1));
+            }
+
+            recentCategories.set(0, product.getCategory());
+
+            setString = new LinkedHashSet<>(recentCategories);
+            sharedPreferences.edit().putStringSet("guest_recent_categories", setString).apply();
+
+            Log.d(">>> Home Activity", "Đã update recent cate (shared pref)");
+        }
+    }
     @Override
     public void onSuggestionClick(Product product) {
         // Handle suggestion click
@@ -614,7 +773,8 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         // Setup category click listeners
         setupCategoryClickListeners();
     }
-    
+
+    // hàm xử lí chuyển danh mục
     private void setupCategoryClickListeners() {
         // Vitamin
         findViewById(R.id.brand_iphone).setOnClickListener(v -> {
@@ -664,6 +824,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         startActivity(intent);
     }
 
+    // ============================
     @Override
     public void onProductClick(Product product) {
         // Xử lý khi click vào sản phẩm - chuyển sang trang chi tiết
@@ -679,6 +840,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         }
     }
 
+    /*
     private void performSearch(String query) {
         if (query.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập từ khóa tìm kiếm", Toast.LENGTH_SHORT).show();
@@ -698,6 +860,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
     }
+    */
 
     private void setupBottomNavigation() {
         // Đánh dấu mục "Home" là đang được chọn khi khởi động
@@ -743,7 +906,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
     private void setupChatIcon() {
         SharedPreferencesManager prefManager = SharedPreferencesManager.getInstance(this);
         String role = prefManager.getUserRole();
-        
+
         // Ẩn chat icon nếu là admin
         if ("admin".equals(role)) {
             if (chatBadgeContainer != null) {
@@ -760,7 +923,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         SharedPreferencesManager prefManager = SharedPreferencesManager.getInstance(this);
         String userId = prefManager.getUserId();
         String role = prefManager.getUserRole();
-        
+
         // Không hiển thị badge cho admin hoặc guest
         if ("admin".equals(role) || userId == null) {
             if (chatBadge != null) {
@@ -768,7 +931,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
             }
             return;
         }
-        
+
         // Load unread message count from Firestore
         String sessionId = userId;
         chatRepository.loadChatSessions(sessions -> {

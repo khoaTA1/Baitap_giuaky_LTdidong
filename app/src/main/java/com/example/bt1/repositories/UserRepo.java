@@ -12,6 +12,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class UserRepo {
@@ -69,7 +73,7 @@ public class UserRepo {
                         user.setAddress(snapshot.getString("address"));
                         //user.setCreatedAt(snapshot.getTimestamp("createdAt").toString());
                         //user.setPassword(snapshot.getString("password"));
-                        //user.setS
+                        user.setRecentCategries((List<String>) snapshot.get("recentCategories"));
 
                         callback.returnResult(user);
                     } else {
@@ -80,6 +84,46 @@ public class UserRepo {
                 .addOnFailureListener(e -> {
                     Log.e("!!! User Repo", "Lỗi: ", e);
                 });
+    }
+
+    // update recent categories
+    public void updateUserRecentCategories(long uid, String mostRecentCate, FireStoreCallBack callback) {
+        // lấy danh sách các cate gần đây của người dùng
+        db.collection(COLLECTION_NAME).document(String.valueOf(uid))
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    Log.d(">>> User Repo", "Tìm thấy user");
+                    List<String> recentCategories;
+
+                    Object obj = documentSnapshot.get("recentCategories");
+                    recentCategories = (obj  == null)
+                            ? new ArrayList<>()
+                            : (List<String>) obj;
+
+                    int maxSize = 3;
+
+                    recentCategories.remove(mostRecentCate);
+
+                    recentCategories.add(0, mostRecentCate);
+
+                    if (recentCategories.size() > maxSize) {
+                        recentCategories = recentCategories.subList(0, maxSize);
+                    }
+
+                    db.collection(COLLECTION_NAME).document(String.valueOf(uid))
+                            .update("recentCategories", recentCategories)
+                            .addOnSuccessListener(v -> {
+                                callback.returnResult("ok");
+                                Log.d(">>> User Repo", "Đã update recent categories cho user với id: " + uid);
+                            }).addOnFailureListener(e -> {
+                                callback.returnResult("notok");
+                                Log.e("!!! User Repo", "Lỗi: ", e);
+                            });
+                }).addOnFailureListener(e -> {
+                    Log.e("!!! User Repo", "Lỗi: ", e);
+                    callback.returnResult("notok");
+                });
+
     }
 
     // UPDATE
