@@ -218,9 +218,19 @@ public class DBHelper extends SQLiteOpenHelper {
         File[] files = cacheDir.listFiles();
         if (files != null) {
             for (File file : files) {
-                if (file.getName().endsWith(".jpg")) file.delete();
+                if (isImageFile(file)) file.delete();
             }
         }
 
+    }
+
+    private boolean isImageFile(File file) {
+        String[] imageExtensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"};
+        for (String extension : imageExtensions) {
+            if (file.getName().toLowerCase().endsWith(extension)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

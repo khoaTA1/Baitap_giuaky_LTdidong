@@ -4,15 +4,13 @@ import android.app.Application;
 import android.util.Log;
 
 import androidx.lifecycle.DefaultLifecycleObserver;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
 import com.example.bt1.utils.DBHelper;
 
-public class CloseApp extends Application implements LifecycleObserver {
+public class App extends Application implements LifecycleObserver {
 
     private DBHelper dbhelper;
 
@@ -21,10 +19,13 @@ public class CloseApp extends Application implements LifecycleObserver {
         super.onCreate();
         dbhelper = new DBHelper(this);
 
+        dbhelper.clearTable();
+        Log.d(">>> App", "Đã xóa bảng product");
         // Đăng ký observer
-        ProcessLifecycleOwner.get().getLifecycle().addObserver(new AppLifecycleObserver());
+        //ProcessLifecycleOwner.get().getLifecycle().addObserver(new AppLifecycleObserver());
     }
 
+    /*
     private class AppLifecycleObserver implements DefaultLifecycleObserver {
 
         @Override
@@ -33,5 +34,5 @@ public class CloseApp extends Application implements LifecycleObserver {
             dbhelper.clearTable();
             Log.d(">>> Close App", "Đã xóa bảng product");
         }
-    }
+    }*/
 }

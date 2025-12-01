@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.bt1.R;
+import com.example.bt1.utils.global;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -24,6 +25,7 @@ public class ProfileActivity extends AppCompatActivity {
     private android.widget.LinearLayout guestMessageContainer;
     private android.widget.LinearLayout menuItemsContainer;
     private android.widget.LinearLayout adminMenuContainer;
+    private global global = new global();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -236,6 +238,9 @@ public class ProfileActivity extends AppCompatActivity {
     private void logout() {
         // Xóa session đăng nhập
         com.example.bt1.utils.SharedPreferencesManager.getInstance(this).clearUserData();
+
+        // đặt load lần đầu để reset phân trang
+        global.isFirstLoad = true;
         
         // Quay về trang Home với vai trò Guest
         Intent intent = new Intent(this, HomeActivity.class);

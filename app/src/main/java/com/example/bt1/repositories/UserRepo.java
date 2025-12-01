@@ -87,36 +87,41 @@ public class UserRepo {
     }
 
     // update recent categories
-    public void updateUserRecentCategories(long uid, String mostRecentCate) {
+    public void updateUserRecentCategories(long uid, String mostRecentCate, FireStoreCallBack callback) {
         // lấy danh sách các cate gần đây của người dùng
         db.collection(COLLECTION_NAME).document(String.valueOf(uid))
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     Log.d(">>> User Repo", "Tìm thấy user");
-                    List<String> recentCategories = new ArrayList<>();
+                    List<String> recentCategories;
 
-                    if (documentSnapshot.contains("recentCategories")) {
-                        Log.d(">>> User Repo", "User đã có trường recent categories");
-                        recentCategories = (List<String>) documentSnapshot.get("recentCategories");
+                    Object obj = documentSnapshot.get("recentCategories");
+                    recentCategories = (obj  == null)
+                            ? new ArrayList<>()
+                            : (List<String>) obj;
 
-                        // dời các category cũ hơn về sau
-                        // để chừa vị trí đầu tiên cho categry gần đây nhất
-                        for (int i = Math.min(recentCategories.size(), 2); i > 0; i--) {
-                            recentCategories.set(i, recentCategories.get(i - 1));
-                        }
+                    int maxSize = 3;
+
+                    recentCategories.remove(mostRecentCate);
+
+                    recentCategories.add(0, mostRecentCate);
+
+                    if (recentCategories.size() > maxSize) {
+                        recentCategories = recentCategories.subList(0, maxSize);
                     }
-
-                    recentCategories.set(0, mostRecentCate);
 
                     db.collection(COLLECTION_NAME).document(String.valueOf(uid))
                             .update("recentCategories", recentCategories)
                             .addOnSuccessListener(v -> {
+                                callback.returnResult("ok");
                                 Log.d(">>> User Repo", "Đã update recent categories cho user với id: " + uid);
                             }).addOnFailureListener(e -> {
+                                callback.returnResult("notok");
                                 Log.e("!!! User Repo", "Lỗi: ", e);
                             });
                 }).addOnFailureListener(e -> {
                     Log.e("!!! User Repo", "Lỗi: ", e);
+                    callback.returnResult("notok");
                 });
 
     }

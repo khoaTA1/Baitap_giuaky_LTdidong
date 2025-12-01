@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.bt1.utils.LoginCallBack;
 import com.example.bt1.utils.Notify;
 import com.example.bt1.utils.PasswordHasher;
+import com.example.bt1.utils.global;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.example.bt1.R;
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView textRegister;
     private TextView textForgotPassword;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private global global = new global();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,6 +207,9 @@ public class MainActivity extends AppCompatActivity {
                             } else {
                                 user.setRole("user"); // Default role
                             }
+
+                            // đặt lại first load để reset phân trang
+                            global.isFirstLoad = true;
 
                             callback.onLoginResult(user);
                             return;

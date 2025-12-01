@@ -86,7 +86,7 @@ public class ProductRepo {
     // Lấy một số sản phẩm
     public void getProductsBatch(int limit, FireStoreCallBack callback) {
         Query query = db.collection(COLLECTION_NAME)
-                .orderBy("name") // hoặc "name" nếu muốn sắp xếp khác
+                .orderBy("name")
                 .limit(limit);
 
         if (lastVisibleDoc != null) {
@@ -127,22 +127,36 @@ public class ProductRepo {
 
     // lấy danh sách sản phẩm theo 3 danh mục gần đây nhất
     public void getProductByRecentCate(List<String> recentCates, int limit, FireStoreCallBack callback) {
-        db.collection("products")
-                .whereIn("category", recentCates).limit(limit)
-                .get()
+        Query query = db.collection("products").limit(limit)
+                .whereIn("category", recentCates);
+
+        if (lastVisibleDoc != null) query = query.startAfter(lastVisibleDoc);
+
+        query.get()
                 .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        lastVisibleDoc = querySnapshot.getDocuments()
+                                .get(querySnapshot.size() - 1);
+                    }
+
                     List<Product> products = new ArrayList<>();
 
                     for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                        products.add(doc.toObject(Product.class));
+                        Product product = doc.toObject(Product.class);
+                        product.setId(Long.valueOf(doc.getId()));
+                        products.add(product);
+                        Log.d(">>> Product Repo", "tải về sản phẩm với id: " + product.getId());
                     }
 
                     callback.returnResult(products);
-                    Log.d(">>> Product Repo", "Đã lấy dược danh sách sản phẩm, số lượng: " + products.size());
+                    Log.d(">>> Product Repo", "Đã lấy được danh sách sản phẩm theo recent cate, số lượng: " + products.size());
                 }).addOnFailureListener(e -> {
                     Log.e("!!! Product Repo", "Lỗi: ", e);
                     callback.returnResult(null);
                 });
+    }
+    public void clearLastDocumentTracked() {
+        lastVisibleDoc = null;
     }
 
     // UPDATE

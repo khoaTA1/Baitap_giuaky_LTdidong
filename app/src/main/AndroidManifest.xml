@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Bt1"
-        android:name=".activities.CloseApp">
+        android:name=".activities.App">
         <activity
             android:name=".activities.HomeActivity"
             android:exported="true">
