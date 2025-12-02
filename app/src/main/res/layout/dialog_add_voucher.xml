@@ -52,21 +52,6 @@
                 android:inputType="numberDecimal"/>
         </com.google.android.material.textfield.TextInputLayout>
         
-        <!-- Giảm tối đa -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Giảm tối đa (đ)"
-            android:layout_marginTop="12dp"
-            app:boxBackgroundMode="outline"
-            app:helperText="Để trống nếu không giới hạn">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edit_max_discount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"/>
-        </com.google.android.material.textfield.TextInputLayout>
-        
         <!-- Số lượng -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"

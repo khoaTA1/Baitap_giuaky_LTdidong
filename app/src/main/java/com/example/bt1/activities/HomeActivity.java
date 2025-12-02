@@ -460,11 +460,19 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
             List<String> recentCates = (recentCates_ifLogged != null && !recentCates_ifLogged.isEmpty()) ? recentCates_ifLogged : recentCates_ifNotLogged;
             Log.d(">>> DEBUG", "danh sách recent cate từ user có số lượng: " + (recentCates_ifLogged != null ? recentCates_ifLogged.size() : 0));
             Log.d(">>> DEBUG", "danh sách recent cate từ local có số lượng: " + (recentCates_ifNotLogged != null ? recentCates_ifNotLogged.size() : 0));
-            Log.d(">>> DEBUG", "danh sách recent cate có số lượng: " + recentCates.size());
+            Log.d(">>> DEBUG", "danh sách recent cate có số lượng: " + (recentCates != null ? recentCates.size() : 0));
 
-            productRepo.getProductByRecentCate(recentCates, PAGE_SIZE_HOME_LIST, object -> {
-                setupProductCards(object);
-            });
+            // Kiểm tra nếu recentCates null hoặc empty → dùng getProductsBatch thay vì getProductByRecentCate
+            if (recentCates == null || recentCates.isEmpty()) {
+                Log.d(">>> DEBUG", "recentCates empty, chuyển sang load tất cả sản phẩm");
+                productRepo.getProductsBatch(PAGE_SIZE_HOME_LIST, object -> {
+                    setupProductCards(object);
+                });
+            } else {
+                productRepo.getProductByRecentCate(recentCates, PAGE_SIZE_HOME_LIST, object -> {
+                    setupProductCards(object);
+                });
+            }
 
             global.isFirstLoad = false;
         }
@@ -601,51 +609,33 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
                     suggestionsHeader.setVisibility(View.GONE);
                     btnSearchAll.setVisibility(View.GONE);
                 } else {
-                    // Search for suggestions (max 3 results)
-                    suggestions.clear();
-                    String searchQuery = newText.toLowerCase().trim();
+                    // Search từ Firestore (query tất cả sản phẩm)
+                    emptyStateView.setVisibility(View.GONE);
                     
-                    // First pass: Find products where NAME matches (higher priority)
-                    for (Product product : productList) {
-                        if (product.getName() != null && 
-                            product.getName().toLowerCase().contains(searchQuery)) {
-                            suggestions.add(product);
-                            if (suggestions.size() >= 3) break; // Max 3 suggestions
-                        }
-                    }
-                    
-                    // Second pass: If still need more, find by CATEGORY
-                    if (suggestions.size() < 3) {
-                        for (Product product : productList) {
-                            if (suggestions.size() >= 3) break;
-                            // Skip if already added (name match)
-                            if (suggestions.contains(product)) continue;
+                    productRepo.searchProducts(newText, 5, result -> {
+                        if (result != null) {
+                            List<Product> searchResults = (List<Product>) result;
+                            suggestions.clear();
+                            suggestions.addAll(searchResults);
                             
-                            if (product.getCategory() != null && 
-                                product.getCategory().toLowerCase().contains(searchQuery)) {
-                                suggestions.add(product);
+                            if (suggestions.isEmpty()) {
+                                // Show no results state
+                                noResultsView.setVisibility(View.VISIBLE);
+                                recyclerSuggestions.setVisibility(View.GONE);
+                                suggestionsHeader.setVisibility(View.GONE);
+                                btnSearchAll.setVisibility(View.GONE);
+                            } else {
+                                // Show suggestions
+                                noResultsView.setVisibility(View.GONE);
+                                recyclerSuggestions.setVisibility(View.VISIBLE);
+                                suggestionsHeader.setVisibility(View.VISIBLE);
+                                btnSearchAll.setVisibility(View.VISIBLE);
+                                
+                                textSuggestionCount.setText(suggestions.size() + " kết quả");
+                                suggestionsAdapter.updateSuggestions(suggestions);
                             }
                         }
-                    }
-                    
-                    if (suggestions.isEmpty()) {
-                        // Show no results state
-                        emptyStateView.setVisibility(View.GONE);
-                        noResultsView.setVisibility(View.VISIBLE);
-                        recyclerSuggestions.setVisibility(View.GONE);
-                        suggestionsHeader.setVisibility(View.GONE);
-                        btnSearchAll.setVisibility(View.GONE);
-                    } else {
-                        // Show suggestions
-                        emptyStateView.setVisibility(View.GONE);
-                        noResultsView.setVisibility(View.GONE);
-                        recyclerSuggestions.setVisibility(View.VISIBLE);
-                        suggestionsHeader.setVisibility(View.VISIBLE);
-                        btnSearchAll.setVisibility(View.VISIBLE);
-                        
-                        textSuggestionCount.setText(suggestions.size() + " kết quả");
-                        suggestionsAdapter.updateSuggestions(suggestions);
-                    }
+                    });
                 }
                 
                 return true;

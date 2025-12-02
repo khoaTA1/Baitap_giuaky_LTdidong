@@ -127,6 +127,11 @@ public class ProductRepo {
 
     // lấy danh sách sản phẩm theo 3 danh mục gần đây nhất
     public void getProductByRecentCate(List<String> recentCates, int limit, FireStoreCallBack callback) {
+        if (recentCates == null || recentCates.isEmpty()) {
+            callback.returnResult(new ArrayList<>()); // Trả về danh sách rỗng nếu không có danh mục
+            return;
+        }
+
         Query query = db.collection("products").limit(limit)
                 .whereIn("category", recentCates);
 
@@ -339,6 +344,60 @@ public class ProductRepo {
                     if (listener != null) {
                         listener.onComplete(com.google.android.gms.tasks.Tasks.forException(e));
                     }
+                });
+    }
+    
+    /**
+     * SEARCH PRODUCTS - Query tất cả sản phẩm từ Firestore theo từ khóa
+     * Tìm kiếm theo tên và category (case-insensitive)
+     */
+    public void searchProducts(String query, int limit, FireStoreCallBack callback) {
+        String searchQuery = query.toLowerCase().trim();
+        
+        if (searchQuery.isEmpty()) {
+            callback.returnResult(new ArrayList<>());
+            return;
+        }
+        
+        // Query tất cả sản phẩm active
+        db.collection(COLLECTION_NAME)
+                .whereEqualTo("isActive", true)
+                .limit(limit > 0 ? limit : 50) // Default max 50 kết quả
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<Product> matchedProducts = new ArrayList<>();
+                    
+                    for (QueryDocumentSnapshot doc : querySnapshot) {
+                        Product product = doc.toObject(Product.class);
+                        
+                        // Set document ID
+                        String docId = doc.getId();
+                        product.setDocumentId(docId);
+                        try {
+                            product.setId(Long.parseLong(docId));
+                        } catch (NumberFormatException e) {
+                            product.setId((long) docId.hashCode());
+                        }
+                        
+                        // Filter by name or category (case-insensitive)
+                        boolean matchesName = product.getName() != null && 
+                                              product.getName().toLowerCase().contains(searchQuery);
+                        boolean matchesCategory = product.getCategory() != null && 
+                                                  product.getCategory().toLowerCase().contains(searchQuery);
+                        boolean matchesBrand = product.getBrand() != null && 
+                                               product.getBrand().toLowerCase().contains(searchQuery);
+                        
+                        if (matchesName || matchesCategory || matchesBrand) {
+                            matchedProducts.add(product);
+                        }
+                    }
+                    
+                    Log.d(">>> ProductRepo", "Search '" + query + "' found " + matchedProducts.size() + " products");
+                    callback.returnResult(matchedProducts);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(">>> ProductRepo", "Search error for: " + query, e);
+                    callback.returnResult(new ArrayList<>());
                 });
     }
 }
