@@ -66,7 +66,6 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
     // Khai báo các view
     private RecyclerView recyclerViewProducts;
     private ProductAdapter productAdapter;
-    private List<Product> productList;
     private BottomNavigationView bottomNavigationView;
     private EditText editSearch;
     private MaterialCardView cardSearch;
@@ -104,6 +103,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
 
     private boolean isLoading = false;
     private global global = new global();
+    private List<Product> productList = global.products;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -155,6 +155,40 @@ public class ProductRepo {
                     callback.returnResult(null);
                 });
     }
+
+    // hàm lấy sản phẩm theo danh mục
+    public void getProductByCategory(String category, int limit, FireStoreCallBack callback) {
+        Query query = db.collection(COLLECTION_NAME)
+                .whereEqualTo("category", category)
+                .limit(limit);
+
+        if (lastVisibleDoc != null) {
+            query = query.startAfter(lastVisibleDoc);
+        }
+
+        query.get()
+                .addOnSuccessListener(snapshots -> {
+                    if (!snapshots.isEmpty()) {
+                        lastVisibleDoc = snapshots.getDocuments()
+                                .get(snapshots.size() - 1);
+                    }
+
+                    List<Product> products = new ArrayList<>();
+
+                    for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                        Product product = doc.toObject(Product.class);
+                        product.setId(Long.valueOf(doc.getId()));
+                        products.add(product);
+                        Log.d(">>> Product Repo", "tải về sản phẩm theo danh mục: " + category + "\nCó id: " + product.getId());
+                    }
+
+                    callback.returnResult(products);
+                    Log.d(">>> Product Repo", "Đã lấy được danh sách sản phẩm theo category, số lượng: " + products.size());
+                }).addOnFailureListener(e -> {
+                    Log.e("!!! Product Repo", "Lỗi: ", e);
+                });
+    }
+
     public void clearLastDocumentTracked() {
         lastVisibleDoc = null;
     }
