@@ -426,6 +426,9 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
                 productAdapter.notifyDataSetChanged();
             }
             Log.d(">>> HomeActivity", "Load lại sản phẩm từ cache SQLite, số lượng: " + productList.size());
+
+            global.isFirstLoad = false;
+            isLoading = false;
             return;
         }
 
@@ -450,6 +453,7 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
             });
 
             global.isFirstLoad = false;
+            isLoading = false;
         } else {
             Log.d(">>> DEBUG", "lấy danh sách recent cate từ: " + ((recentCates_ifLogged != null && !recentCates_ifLogged.isEmpty()) ? "user" : "guest"));
 
@@ -475,11 +479,78 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
             }
 
             global.isFirstLoad = false;
+            isLoading = false;
         }
     }
 
     // ===========================
 
+    private void setupProductCards(Object object) {
+        renderImage = new RenderImage();
+
+        if (object == null) {
+            Log.e(">>> HomeActivity", "Lỗi: Firestore trả về null");
+            isLoading = false;
+            return;
+        }
+
+        List<Product> products = (List<Product>) object;
+
+        if (products.isEmpty()) {
+            Log.d(">>> HomeActivity", "Hết dữ liệu để load");
+            isLoading = false;
+            return;
+        }
+
+        // Lấy danh sách ID sản phẩm đã có trong SQLite
+        List<Long> productIdList = dbhelper.getAllProductIds();
+        AtomicInteger counter = new AtomicInteger(products.size());
+
+        for (Product product : products) {
+            if (!productIdList.contains(product.getId())) {
+                Log.d(">>> Setup product card", "Tải sản phẩm có id: " + product.getId());
+
+                renderImage.downloadAndSaveImage(this, product, () -> {
+                    // Thêm vào SQLite và cập nhật danh sách ID ngay
+                    dbhelper.insertProducts(Collections.singletonList(product));
+                    productIdList.add(product.getId());
+
+                    runOnUiThread(() -> {
+                        // Kiểm tra trùng trong productList trước khi add
+                        boolean alreadyExists = productList.stream()
+                                .anyMatch(p -> p.getId() == product.getId());
+                        if (!alreadyExists) {
+                            productList.add(product);
+
+                            if (productAdapter == null) {
+                                productAdapter = new ProductAdapter(this, productList, this);
+                                recyclerViewProducts.setAdapter(productAdapter);
+                            } else {
+                                productAdapter.notifyDataSetChanged();
+                            }
+                        } else {
+                            Log.d(">>> Setup product card", "Phát hiện trùng trong productList, bỏ qua add");
+                        }
+                    });
+
+                    // Giảm counter và kiểm tra trạng thái loading
+                    if (counter.decrementAndGet() == 0) {
+                        isLoading = false;
+                    }
+                });
+            } else {
+                Log.d(">>> Setup product card", "Sản phẩm trùng, bỏ qua id: " + product.getId());
+
+                // Giảm counter ngay cả khi bỏ qua sản phẩm trùng
+                if (counter.decrementAndGet() == 0) {
+                    isLoading = false;
+                }
+            }
+        }
+    }
+
+
+    /*
     private void setupProductCards(Object object) {
         renderImage = new RenderImage();
         if (object == null) {
@@ -494,31 +565,39 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
             return;
         }
 
+        List<Long> productIdList = dbhelper.getAllProductIds();
+
         AtomicInteger counter = new AtomicInteger(((List<Product>) object).size());
 
         for (Product product : (List<Product>) object) {
-            renderImage.downloadAndSaveImage(this, product, () -> {
-                // tải ảnh và lưu product vào SQLite
-                dbhelper.insertProducts(Collections.singletonList(product));
+            if (!productIdList.contains(product.getId())) {
+                Log.d(">>> Setup product card", "View sản phẩm có id: " + product.getId());
+                renderImage.downloadAndSaveImage(this, product, () -> {
+                    // tải ảnh và lưu product vào SQLite
+                    dbhelper.insertProducts(Collections.singletonList(product));
 
-                // Thêm product vào productList và cập nhật RecyclerView
-                runOnUiThread(() -> {
-                    productList.add(product);
-                    if (productAdapter == null) {
-                        productAdapter = new ProductAdapter(this, productList, this);
-                        recyclerViewProducts.setAdapter(productAdapter);
-                    } else {
-                        productAdapter.notifyDataSetChanged();
-                    }
+                    // Thêm product vào productList và cập nhật RecyclerView
+                    runOnUiThread(() -> {
+                        productList.add(product);
+
+                        if (productAdapter == null) {
+                            productAdapter = new ProductAdapter(this, productList, this);
+                            recyclerViewProducts.setAdapter(productAdapter);
+                        } else {
+                            productAdapter.notifyDataSetChanged();
+                        }
+                    });
                 });
-            });
+            } else {
+                Log.e("!!! Setup product card", "Phát hiện trùng sản phẩm");
+            }
 
             // ngừng trạng thái loading sau khi tải xong tất cả các ảnh sản phẩm
             if (counter.decrementAndGet() == 0) {
                 isLoading = false;
             }
         }
-    }
+    }*/
 
     private void setupSearchListener() {
         // Khi click vào card search, mở dialog tìm kiếm
@@ -683,9 +762,9 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
         } else {
             SharedPreferences sharedPreferences = this.getSharedPreferences("guest", MODE_PRIVATE);
 
-            Set<String> setString = sharedPreferences.getStringSet("guest_recent_categories", null);
+            Set<String> setString;
 
-            if (setString == null) {
+            if (sharedPreferences.getStringSet("guest_recent_categories", null) == null) {
                 setString = new LinkedHashSet<>();
                 setString.add(product.getCategory());
 
@@ -693,17 +772,21 @@ public class HomeActivity extends AppCompatActivity implements ProductAdapter.On
                 Log.d(">>> Home Activity", "đã tạo mới danh sách danh mục gần đây");
 
                 return;
+            } else {
+                setString = new LinkedHashSet<>(sharedPreferences.getStringSet("guest_recent_categories", null));
             }
 
             // nếu đã tồn tại trong local thì đẩy các cate cũ xuống
             // và thêm cate mới nhất vào đầu
             List<String> recentCategories = new ArrayList<>(setString);
 
-            for (int i = Math.min(recentCategories.size(), 2); i > 0; i--) {
-                recentCategories.set(i, recentCategories.get(i - 1));
-            }
+            recentCategories.remove(product.getCategory());
 
-            recentCategories.set(0, product.getCategory());
+            recentCategories.add(0, product.getCategory());
+
+            if (recentCategories.size() > 3) {
+                recentCategories = recentCategories.subList(0, 3);
+            }
 
             setString = new LinkedHashSet<>(recentCategories);
             sharedPreferences.edit().putStringSet("guest_recent_categories", setString).apply();

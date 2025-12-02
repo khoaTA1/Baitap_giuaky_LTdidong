@@ -53,6 +53,7 @@ public class ShopActivity extends AppCompatActivity implements ProductAdapter.On
     private String filterValue = "";
     private String sortType = "name"; // "name", "price_low", "price_high"
     private boolean isLoadingProducts = false;
+    private int PAGE_SIZE = 6;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +159,41 @@ public class ShopActivity extends AppCompatActivity implements ProductAdapter.On
         }
         
         // Load từ Firebase (sẽ update cache và UI)
+        productRepo.getProductByCategory(filterValue, PAGE_SIZE, obj -> {
+            isLoadingProducts = false;
+
+            if (obj != null && obj instanceof List) {
+                List<Product> products = (List<Product>) obj;
+                android.util.Log.d(">>> ShopActivity", "Loaded " + products.size() + " products from Firebase");
+
+                allProducts.clear();
+                allProducts.addAll(products);
+
+                // Cache vào SQLite
+                try {
+                    // dbHelper.clearTable();
+                    dbHelper.insertProducts(products);
+                    android.util.Log.d(">>> ShopActivity", "Cached products to SQLite");
+                } catch (Exception e) {
+                    android.util.Log.e("!!! ShopActivity", "Error caching products: " + e.getMessage());
+                }
+
+                // Apply filter và update UI
+                applyFilter();
+            } else {
+                android.util.Log.e("!!! ShopActivity", "Failed to load products from Firebase");
+
+                // Nếu không có cache, hiển thị empty state
+                if (allProducts.isEmpty()) {
+                    runOnUiThread(() -> {
+                        recyclerViewProducts.setVisibility(View.GONE);
+                        emptyState.setVisibility(View.VISIBLE);
+                        Toast.makeText(this, "Không thể tải danh sách sản phẩm", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+        });
+        /*
         productRepo.getAllProducts(object -> {
             isLoadingProducts = false;
             
@@ -191,7 +227,7 @@ public class ShopActivity extends AppCompatActivity implements ProductAdapter.On
                     });
                 }
             }
-        });
+        });*/
     }
 
     private void setupRecyclerView() {

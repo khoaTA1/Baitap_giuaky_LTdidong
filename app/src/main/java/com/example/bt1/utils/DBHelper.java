@@ -110,6 +110,7 @@ public class DBHelper extends SQLiteOpenHelper {
             Log.d(">>> SQLite", "insertProducts: bắt đầu insert sản phẩm vào sqlite");
             for (Product product : productList) {
                 ContentValues values = new ContentValues();
+                values.put(PRODUCT_COLUMN_ID, product.getId());
                 values.put(PRODUCT_COLUMN_NAME, product.getName());
                 values.put(PRODUCT_COLUMN_BRAND, product.getBrand());
                 values.put(PRODUCT_COLUMN_PRICE, product.getPrice());
@@ -129,7 +130,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 values.put(PRODUCT_COLUMN_SIDEEFFECTS, product.getSideEffects());
                 values.put(PRODUCT_COLUMN_OBJECT, product.getObject());
 
-                db.insert(PRODUCT_TABLE_NAME, null, values);
+                db.insertWithOnConflict(PRODUCT_TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
             }
             db.setTransactionSuccessful();
             Log.d(">>> SQLite", "Đã thêm danh sách sản phẩm");
@@ -139,6 +140,32 @@ public class DBHelper extends SQLiteOpenHelper {
             db.endTransaction();
             db.close();
         }
+    }
+
+    public List<Long> getAllProductIds() {
+        List<Long> ids = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            cursor = db.rawQuery("SELECT " + PRODUCT_COLUMN_ID + " FROM " + PRODUCT_TABLE_NAME, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    ids.add(cursor.getLong(0));
+                } while (cursor.moveToNext());
+            }
+
+            Log.d(">>> SQLite", "Danh sách id sản phẩm trong local: " + ids.toString());
+        } catch (Exception e) {
+            Log.e("!!! SQLite", "Lỗi:", e);
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
+        }
+
+        return ids;
     }
 
     public List<Product> getAllProducts() {
