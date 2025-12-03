@@ -125,7 +125,7 @@
                     android:textColor="#DC143C"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    tools:text="22.990.000đ" />
+                    tools:text="22.990.000đ / Hộp" />
 
                 <!-- Original price (crossed out) -->
                 <TextView

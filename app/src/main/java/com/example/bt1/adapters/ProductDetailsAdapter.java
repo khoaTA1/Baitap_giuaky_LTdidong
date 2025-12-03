@@ -301,7 +301,7 @@ public class ProductDetailsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         }
 
         void bind(ProductDetailsAbstract.SimilarProductsSection section) {
-            ProductAdapter adapter = new ProductAdapter(context, section.similarProducts, product -> {
+            SimilarProductsAdapter adapter = new SimilarProductsAdapter(context, section.similarProducts, product -> {
                 Intent intent = new Intent(context, ProductDetailActivity.class);
                 intent.putExtra("product_id", product.getId());
                 context.startActivity(intent);

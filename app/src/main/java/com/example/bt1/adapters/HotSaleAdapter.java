@@ -63,6 +63,7 @@ public class HotSaleAdapter extends RecyclerView.Adapter<HotSaleAdapter.HotSaleV
         private TextView textProductName;
         private RatingBar ratingBar;
         private TextView textRating;
+        private TextView textSoldCount;
         private TextView textSalePrice, textOriginalPrice;
         private Button btnAddToCart;
 
@@ -75,6 +76,7 @@ public class HotSaleAdapter extends RecyclerView.Adapter<HotSaleAdapter.HotSaleV
             textProductName = itemView.findViewById(R.id.text_product_name);
             ratingBar = itemView.findViewById(R.id.rating_bar);
             textRating = itemView.findViewById(R.id.text_rating);
+            textSoldCount = itemView.findViewById(R.id.text_sold_count);
             textSalePrice = itemView.findViewById(R.id.text_sale_price);
             textOriginalPrice = itemView.findViewById(R.id.text_original_price);
             btnAddToCart = itemView.findViewById(R.id.btn_add_to_cart);
@@ -111,6 +113,8 @@ public class HotSaleAdapter extends RecyclerView.Adapter<HotSaleAdapter.HotSaleV
                 ratingBar.setRating(product.getRating());
                 textRating.setText(String.valueOf(product.getRating()));
             }
+
+            textSoldCount.setText("Đã bán: " + product.getSoldCount());
 
             
             itemView.setOnClickListener(v -> listener.onProductClick(product));
