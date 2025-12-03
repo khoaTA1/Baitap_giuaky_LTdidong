@@ -159,40 +159,80 @@ public class ShopActivity extends AppCompatActivity implements ProductAdapter.On
         }
         
         // Load từ Firebase (sẽ update cache và UI)
-        productRepo.getProductByCategory(filterValue, PAGE_SIZE, obj -> {
-            isLoadingProducts = false;
+        // Kiểm tra filterType để gọi đúng phương thức
+        if ("all".equals(filterType)) {
+            // Load tất cả sản phẩm
+            productRepo.getAllProducts(obj -> {
+                isLoadingProducts = false;
 
-            if (obj != null && obj instanceof List) {
-                List<Product> products = (List<Product>) obj;
-                android.util.Log.d(">>> ShopActivity", "Loaded " + products.size() + " products from Firebase");
+                if (obj != null && obj instanceof List) {
+                    List<Product> products = (List<Product>) obj;
+                    android.util.Log.d(">>> ShopActivity", "Loaded " + products.size() + " products from Firebase");
 
-                allProducts.clear();
-                allProducts.addAll(products);
+                    allProducts.clear();
+                    allProducts.addAll(products);
 
-                // Cache vào SQLite
-                try {
-                    // dbHelper.clearTable();
-                    dbHelper.insertProducts(products);
-                    android.util.Log.d(">>> ShopActivity", "Cached products to SQLite");
-                } catch (Exception e) {
-                    android.util.Log.e("!!! ShopActivity", "Error caching products: " + e.getMessage());
+                    // Cache vào SQLite
+                    try {
+                        // dbHelper.clearTable();
+                        dbHelper.insertProducts(products);
+                        android.util.Log.d(">>> ShopActivity", "Cached products to SQLite");
+                    } catch (Exception e) {
+                        android.util.Log.e("!!! ShopActivity", "Error caching products: " + e.getMessage());
+                    }
+
+                    // Apply filter và update UI
+                    applyFilter();
+                } else {
+                    android.util.Log.e("!!! ShopActivity", "Failed to load products from Firebase");
+
+                    // Nếu không có cache, hiển thị empty state
+                    if (allProducts.isEmpty()) {
+                        runOnUiThread(() -> {
+                            recyclerViewProducts.setVisibility(View.GONE);
+                            emptyState.setVisibility(View.VISIBLE);
+                            Toast.makeText(this, "Không thể tải danh sách sản phẩm", Toast.LENGTH_SHORT).show();
+                        });
+                    }
                 }
+            });
+        } else {
+            // Load theo category
+            productRepo.getProductByCategory(filterValue, PAGE_SIZE, obj -> {
+                isLoadingProducts = false;
 
-                // Apply filter và update UI
-                applyFilter();
-            } else {
-                android.util.Log.e("!!! ShopActivity", "Failed to load products from Firebase");
+                if (obj != null && obj instanceof List) {
+                    List<Product> products = (List<Product>) obj;
+                    android.util.Log.d(">>> ShopActivity", "Loaded " + products.size() + " products from Firebase");
 
-                // Nếu không có cache, hiển thị empty state
-                if (allProducts.isEmpty()) {
-                    runOnUiThread(() -> {
-                        recyclerViewProducts.setVisibility(View.GONE);
-                        emptyState.setVisibility(View.VISIBLE);
-                        Toast.makeText(this, "Không thể tải danh sách sản phẩm", Toast.LENGTH_SHORT).show();
-                    });
+                    allProducts.clear();
+                    allProducts.addAll(products);
+
+                    // Cache vào SQLite
+                    try {
+                        // dbHelper.clearTable();
+                        dbHelper.insertProducts(products);
+                        android.util.Log.d(">>> ShopActivity", "Cached products to SQLite");
+                    } catch (Exception e) {
+                        android.util.Log.e("!!! ShopActivity", "Error caching products: " + e.getMessage());
+                    }
+
+                    // Apply filter và update UI
+                    applyFilter();
+                } else {
+                    android.util.Log.e("!!! ShopActivity", "Failed to load products from Firebase");
+
+                    // Nếu không có cache, hiển thị empty state
+                    if (allProducts.isEmpty()) {
+                        runOnUiThread(() -> {
+                            recyclerViewProducts.setVisibility(View.GONE);
+                            emptyState.setVisibility(View.VISIBLE);
+                            Toast.makeText(this, "Không thể tải danh sách sản phẩm", Toast.LENGTH_SHORT).show();
+                        });
+                    }
                 }
-            }
-        });
+            });
+        }
         /*
         productRepo.getAllProducts(object -> {
             isLoadingProducts = false;
