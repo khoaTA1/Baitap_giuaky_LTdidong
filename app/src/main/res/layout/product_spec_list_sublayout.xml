@@ -30,17 +30,35 @@
         android:id="@+id/text_spec_value"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/darker_gray"
-        android:textSize="16sp"
-        android:gravity="start"
-        android:maxLines="5"
-        android:ellipsize="end"
-        android:singleLine="false"
+        android:textColor="@color/text_secondary"
         app:layout_constraintStart_toEndOf="@id/text_spec_key"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:text="Tinh dầu hoa anh thảo, Vitamin E, Nhân Sâm, Trinh nữ, Chiết xuất Maca" />
+        android:textSize="16sp"
+        android:gravity="start"
+        android:singleLine="false"
+        tools:text="Tinh dầu hoa anh thảo, Vitamin E, Nhân Sâm, Trinh nữ, Chiết xuất Maca, sdfghgfddfgsdfghgfdsdfghgfdsdfghgfdfghhgf" />
+
+
+    <!--
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/scrollview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/text_spec_key"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxHeight="20dp"
+            android:fillViewport="true"
+            app:layout_constrainedHeight="true">
+
+            </androidx.core.widget.NestedScrollView>
+    </com.google.android.material.card.MaterialCardView>
+    -->
 
     <!-- Tạo horizontal chain thực sự -->
     <androidx.constraintlayout.widget.Guideline
